@@ -600,33 +600,11 @@ Pending
 
 ---
 
-# Git Branch Strategy
+# Deployment 
 
-main
-
-Production-ready code
-
-develop
-
-Development branch
-
-feature/frontend
-
-Frontend work
-
-feature/backend
-
-Backend work
-
-feature/admin
-
-Admin dashboard
-
-feature/responsive
-
-Responsive design
-
----
+Frontend - Vercel
+Backend - Render
+Database - MongoDB Atlas (Free Tier)
 
 # Coding Standards
 
