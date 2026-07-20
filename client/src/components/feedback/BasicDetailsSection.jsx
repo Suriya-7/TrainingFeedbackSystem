@@ -4,185 +4,198 @@ function BasicDetailsSection({
   errors,
   setErrors,
 }) {
-  // Handle input change and clear error for that field
+
   const handleInputChange = (e) => {
+
     handleChange(e);
 
     const { name } = e.target;
 
     if (errors[name]) {
+
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
+
     }
+
   };
 
+
+  const inputClass = (field) =>
+    `w-full px-2 py-1 rounded-sm text-sm focus:outline-none ${
+      errors?.[field]
+        ? "border border-red-500"
+        : "border border-gray-400 focus:ring-1 focus:ring-gray-400"
+    }`;
+
+
   return (
-    <table className="mt-6 w-full border border-black border-collapse text-sm">
+
+    <table className="mt-3 w-full border border-black border-collapse text-sm">
+
       <tbody>
 
-        {/* Row 1 */}
         <tr>
-          <td className="border border-black p-3 w-2/3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold whitespace-nowrap min-w-[150px]">
-                  Participant's Name:
-                </label>
 
-                <input
-                  type="text"
-                  name="participantName"
-                  value={formData.participantName}
-                  onChange={handleInputChange}
-                  placeholder="Enter Your Name"
-                  className={`flex-1 px-3 py-2 rounded-md transition duration-200 focus:outline-none
-                    ${
-                      errors?.participantName
-                        ? "border-2 border-red-500"
-                        : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-                    }`}
-                />
-              </div>
+          <td className="border border-black p-2">
 
-              {errors?.participantName && (
-                <p className="text-red-500 text-xs mt-1 ml-[165px]">
-                  {errors.participantName}
-                </p>
-              )}
+            <div className="flex items-center gap-2">
+
+              <label className="font-semibold whitespace-nowrap w-36">
+                Participant's Name:
+              </label>
+
+              <input
+                type="text"
+                name="participantName"
+                value={formData.participantName}
+                onChange={handleInputChange}
+                placeholder="Enter Your Name"
+                className={inputClass("participantName")}
+              />
+
             </div>
+
+            {errors?.participantName && (
+              <p className="text-red-500 text-xs mt-0.5 ml-36">
+                {errors.participantName}
+              </p>
+            )}
+
           </td>
 
-          <td className="border border-black p-3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold whitespace-nowrap">
-                  Emp. No:
-                </label>
 
-                <input
-                  type="text"
-                  name="employeeNo"
-                  value={formData.employeeNo}
-                  onChange={handleInputChange}
-                  placeholder="Employee ID"
-                  className={`flex-1 px-3 py-2 rounded-md transition duration-200 focus:outline-none
-                    ${
-                      errors?.employeeNo
-                        ? "border-2 border-red-500"
-                        : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-                    }`}
-                />
-              </div>
+          <td className="border border-black p-2">
 
-              {errors?.employeeNo && (
-                <p className="text-red-500 text-xs mt-1 ml-[85px]">
-                  {errors.employeeNo}
-                </p>
-              )}
+            <div className="flex items-center gap-2">
+
+              <label className="font-semibold whitespace-nowrap">
+                Emp. No:
+              </label>
+
+              <input
+                type="text"
+                name="employeeNo"
+                value={formData.employeeNo}
+                onChange={handleInputChange}
+                placeholder="Employee ID"
+                className={inputClass("employeeNo")}
+              />
+
             </div>
+
+            {errors?.employeeNo && (
+              <p className="text-red-500 text-xs mt-0.5">
+                {errors.employeeNo}
+              </p>
+            )}
+
           </td>
+
         </tr>
 
-        {/* Row 2 */}
+
         <tr>
-          <td className="border border-black p-3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold whitespace-nowrap min-w-[150px]">
-                  Department:
-                </label>
 
-                <input
-                  type="text"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                  placeholder="Department"
-                  className={`flex-1 px-3 py-2 rounded-md transition duration-200 focus:outline-none
-                    ${
-                      errors?.department
-                        ? "border-2 border-red-500"
-                        : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-                    }`}
-                />
-              </div>
+          <td className="border border-black p-2">
 
-              {errors?.department && (
-                <p className="text-red-500 text-xs mt-1 ml-[165px]">
-                  {errors.department}
-                </p>
-              )}
+            <div className="flex items-center gap-2">
+
+              <label className="font-semibold whitespace-nowrap w-36">
+                Department:
+              </label>
+
+              <input
+                type="text"
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                placeholder="Department"
+                className={inputClass("department")}
+              />
+
             </div>
+
+            {errors?.department && (
+              <p className="text-red-500 text-xs mt-0.5 ml-36">
+                {errors.department}
+              </p>
+            )}
+
           </td>
 
-          <td className="border border-black p-3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold whitespace-nowrap">
-                  Date:
-                </label>
 
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  className={`flex-1 px-3 py-2 rounded-md transition duration-200 focus:outline-none
-                    ${
-                      errors?.date
-                        ? "border-2 border-red-500"
-                        : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-                    }`}
-                />
-              </div>
+          <td className="border border-black p-2">
 
-              {errors?.date && (
-                <p className="text-red-500 text-xs mt-1 ml-[55px]">
-                  {errors.date}
-                </p>
-              )}
+            <div className="flex items-center gap-2">
+
+              <label className="font-semibold whitespace-nowrap">
+                Date:
+              </label>
+
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className={inputClass("date")}
+              />
+
             </div>
+
+            {errors?.date && (
+              <p className="text-red-500 text-xs mt-0.5">
+                {errors.date}
+              </p>
+            )}
+
           </td>
+
         </tr>
 
-        {/* Row 3 */}
+
         <tr>
-          <td colSpan="2" className="border border-black p-3">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold whitespace-nowrap min-w-[150px]">
-                  Course / Programme:
-                </label>
 
-                <input
-                  type="text"
-                  name="course"
-                  value={formData.course}
-                  onChange={handleInputChange}
-                  placeholder="Enter course/programme"
-                  className={`flex-1 px-3 py-2 rounded-md transition duration-200 focus:outline-none
-                    ${
-                      errors?.course
-                        ? "border-2 border-red-500"
-                        : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-                    }`}
-                />
-              </div>
+          <td
+            colSpan="2"
+            className="border border-black p-2"
+          >
 
-              {errors?.course && (
-                <p className="text-red-500 text-xs mt-1 ml-[165px]">
-                  {errors.course}
-                </p>
-              )}
+            <div className="flex items-center gap-2">
+
+              <label className="font-semibold whitespace-nowrap w-36">
+                Course / Programme:
+              </label>
+
+              <input
+                type="text"
+                name="course"
+                value={formData.course}
+                onChange={handleInputChange}
+                placeholder="Enter course/programme"
+                className={inputClass("course")}
+              />
+
             </div>
+
+            {errors?.course && (
+              <p className="text-red-500 text-xs mt-0.5 ml-36">
+                {errors.course}
+              </p>
+            )}
+
           </td>
+
         </tr>
 
       </tbody>
+
     </table>
+
   );
+
 }
 
 export default BasicDetailsSection;

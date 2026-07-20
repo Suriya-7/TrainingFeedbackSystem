@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// Initial form values
 const initialFormData = {
 
   participantName: "",
@@ -9,7 +8,6 @@ const initialFormData = {
   date: "",
   course: "",
 
-
   content: "",
   presentation: "",
   style: "",
@@ -17,18 +15,11 @@ const initialFormData = {
   venue: "",
   others: "",
 
-
-  // Expectations
   expectation: "Yes",
   expectationYes: "",
   expectationNo: "",
 
-
-  // Skills
   skills: "",
-  skillsYes: "",
-  skillsNo: "",
-
 
   suggestions: ""
 
@@ -38,8 +29,9 @@ const initialFormData = {
 export default function useFeedbackForm() {
 
 
-  const [formData, setFormData] = useState(initialFormData);
-
+  const [formData, setFormData] = useState({
+    ...initialFormData
+  });
 
 
   const handleChange = (e) => {
@@ -58,14 +50,13 @@ export default function useFeedbackForm() {
   };
 
 
-
-  // Reset the form after successful submission
   const resetForm = () => {
 
-    setFormData(initialFormData);
+    setFormData({
+      ...initialFormData
+    });
 
   };
-
 
 
   return {

@@ -100,25 +100,9 @@ export default function validateFeedbackForm(formData) {
   // Skills
   // ======================
 
-  if (!formData.skills) {
+  if (!formData.skills?.trim()) {
 
     missingFields.push("Skills");
-
-  }
-  else if (
-    formData.skills === "Yes" &&
-    !formData.skillsYes?.trim()
-  ) {
-
-    missingFields.push("How Skills Will Be Applied");
-
-  }
-  else if (
-    formData.skills === "No" &&
-    !formData.skillsNo?.trim()
-  ) {
-
-    missingFields.push("Reason Skills Cannot Be Applied");
 
   }
 
@@ -129,7 +113,9 @@ export default function validateFeedbackForm(formData) {
   // ======================
 
   if (!formData.suggestions?.trim()) {
+
     missingFields.push("Suggestions");
+
   }
 
 

@@ -5,19 +5,63 @@ function ExpectationsSection({
   setErrors,
 }) {
 
-  const handleInputChange = (e) => {
+const handleInputChange = (e) => {
 
-    const { name } = e.target;
+  const { name } = e.target;
 
+  handleChange(e);
+
+  if (errors[name]) {
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+
+  }
+
+};
+
+
+  const handleExpectationChange = (e) => {
+
+    const { value } = e.target;
 
     handleChange(e);
 
 
-    if (errors[name]) {
+    if (value === "Yes") {
+
+      handleChange({
+        target: {
+          name: "expectationNo",
+          value: "",
+        },
+      });
 
       setErrors((prev) => ({
         ...prev,
-        [name]: "",
+        expectation: "",
+        expectationNo: "",
+      }));
+
+    }
+
+
+    if (value === "No") {
+
+      handleChange({
+        target: {
+          name: "expectationYes",
+          value: "",
+        },
+      });
+
+
+      setErrors((prev) => ({
+        ...prev,
+        expectation: "",
+        expectationYes: "",
       }));
 
     }
@@ -31,30 +75,21 @@ function ExpectationsSection({
 
       <tbody>
 
-
-        {/* Main Question */}
-
         <tr>
 
           <td className="border border-black p-2 w-10 text-center">
             2
           </td>
 
-
           <td className="border border-black p-2">
 
-
-            <div className="flex justify-between items-center">
-
+            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
 
               <span className="font-semibold">
                 Were your expectations met?
               </span>
 
-
-
-              <div className="flex gap-8">
-
+              <div className="flex gap-6">
 
                 <label className="flex items-center gap-2 cursor-pointer">
 
@@ -63,14 +98,13 @@ function ExpectationsSection({
                     name="expectation"
                     value="Yes"
                     checked={formData.expectation === "Yes"}
-                    onChange={handleInputChange}
+                    onChange={handleExpectationChange}
                     className="w-4 h-4 accent-gray-700"
                   />
 
                   Yes
 
                 </label>
-
 
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -80,7 +114,7 @@ function ExpectationsSection({
                     name="expectation"
                     value="No"
                     checked={formData.expectation === "No"}
-                    onChange={handleInputChange}
+                    onChange={handleExpectationChange}
                     className="w-4 h-4 accent-gray-700"
                   />
 
@@ -88,12 +122,9 @@ function ExpectationsSection({
 
                 </label>
 
-
               </div>
 
-
             </div>
-
 
 
             {errors?.expectation && (
@@ -104,15 +135,10 @@ function ExpectationsSection({
 
             )}
 
-
           </td>
-
 
         </tr>
 
-
-
-        {/* YES Section */}
 
         {formData.expectation === "Yes" && (
 
@@ -125,11 +151,9 @@ function ExpectationsSection({
 
             <td className="border border-black p-2">
 
-
               <p className="mb-2">
                 Please list major areas of your learning:
               </p>
-
 
 
               <textarea
@@ -144,30 +168,22 @@ function ExpectationsSection({
 
                 placeholder="Enter your learning..."
 
-                className={`w-full px-3 py-2 rounded-md focus:outline-none ${
-                  
+                className={`w-full px-3 py-2 rounded-md focus:outline-none resize-none ${
                   errors?.expectationYes
-
-                  ? "border-2 border-red-500"
-
-                  : "border border-gray-500"
-
+                    ? "border-2 border-red-500"
+                    : "border border-gray-500"
                 }`}
 
               />
 
 
-
               {errors?.expectationYes && (
 
                 <p className="text-red-500 text-xs mt-1">
-
                   {errors.expectationYes}
-
                 </p>
 
               )}
-
 
             </td>
 
@@ -175,11 +191,6 @@ function ExpectationsSection({
 
         )}
 
-
-
-
-
-        {/* NO Section */}
 
         {formData.expectation === "No" && (
 
@@ -192,11 +203,9 @@ function ExpectationsSection({
 
             <td className="border border-black p-2">
 
-
               <p className="mb-2">
                 Please give reasons:
               </p>
-
 
 
               <textarea
@@ -211,42 +220,30 @@ function ExpectationsSection({
 
                 placeholder="Enter the reason..."
 
-                className={`w-full px-3 py-2 rounded-md focus:outline-none ${
-                  
+                className={`w-full px-3 py-2 rounded-md focus:outline-none resize-none ${
                   errors?.expectationNo
-
-                  ? "border-2 border-red-500"
-
-                  : "border border-gray-500"
-
+                    ? "border-2 border-red-500"
+                    : "border border-gray-500"
                 }`}
 
               />
 
 
-
               {errors?.expectationNo && (
 
                 <p className="text-red-500 text-xs mt-1">
-
                   {errors.expectationNo}
-
                 </p>
 
               )}
 
-
             </td>
-
 
           </tr>
 
         )}
 
-
-
       </tbody>
-
 
     </table>
 
