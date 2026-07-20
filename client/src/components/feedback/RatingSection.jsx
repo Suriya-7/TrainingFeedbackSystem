@@ -1,4 +1,9 @@
-function RatingSection({ formData, handleChange }) {
+function RatingSection({
+  formData,
+  handleChange,
+  errors,
+  setErrors,
+}) {
   const ratingItems = [
     { id: "a", label: "Content", name: "content" },
     { id: "b", label: "Presentation", name: "presentation" },
@@ -18,11 +23,24 @@ function RatingSection({ formData, handleChange }) {
 
   const ratings = ["Poor", "Acceptable", "Excellent"];
 
+  const handleRatingChange = (e) => {
+    handleChange(e);
+
+    const { name } = e.target;
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
   return (
     <table className="mt-6 w-full border border-black border-collapse text-sm">
       <tbody>
 
-        {/* Header Row */}
+        {/* Header */}
         <tr>
           <td
             rowSpan={ratingItems.length + 1}
@@ -49,23 +67,47 @@ function RatingSection({ formData, handleChange }) {
         </tr>
 
         {ratingItems.map((item) => (
-          <tr key={item.name}>
-            <td className="border border-black px-3 py-2">
+          <tr
+            key={item.name}
+            className={
+              errors?.[item.name]
+                ? "bg-red-50"
+                : ""
+            }
+          >
+            <td
+              className={`border px-3 py-2 ${
+                errors?.[item.name]
+                  ? "border-red-500"
+                  : "border-black"
+              }`}
+            >
               <span className="italic mr-2">{item.id}.</span>
+
               {item.label}
+
+              {errors?.[item.name] && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors[item.name]}
+                </p>
+              )}
             </td>
 
             {ratings.map((rating) => (
               <td
                 key={rating}
-                className="border border-black text-center"
+                className={`text-center ${
+                  errors?.[item.name]
+                    ? "border border-red-500"
+                    : "border border-black"
+                }`}
               >
                 <input
                   type="radio"
                   name={item.name}
                   value={rating}
                   checked={formData[item.name] === rating}
-                  onChange={handleChange}
+                  onChange={handleRatingChange}
                   className="w-4 h-4 accent-gray-700 cursor-pointer"
                 />
               </td>
