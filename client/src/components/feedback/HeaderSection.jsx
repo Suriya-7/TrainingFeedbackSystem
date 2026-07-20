@@ -1,65 +1,154 @@
 import dietechLogo from "../../assets/dietech-logo.png";
 
 function HeaderSection() {
-
   return (
+    <div
+      className="
+      bg-white
+      rounded-xl
+      shadow-md
+      border
+      border-gray-200
+      overflow-hidden
+      "
+    >
 
-    <div className="border border-black">
+      {/* Company Header */}
+      <div
+        className="
+        grid
+        grid-cols-1
+        md:grid-cols-12
+        gap-0
+        "
+      >
 
-      <div className="grid grid-cols-1 sm:grid-cols-12 border-b border-black">
-
-        <div className="sm:col-span-3 flex items-center justify-center border-b sm:border-b-0 sm:border-r border-black h-16 sm:h-20 p-1">
-
+        {/* Logo Section */}
+        <div
+          className="
+          md:col-span-3
+          flex
+          items-center
+          justify-center
+          p-4
+          border-b
+          md:border-b-0
+          md:border-r
+          border-gray-200
+          "
+        >
           <img
             src={dietechLogo}
             alt="Dietech Logo"
-            className="max-h-14 sm:max-h-16 object-contain"
+            className="
+            max-h-16
+            md:max-h-20
+            object-contain
+            "
           />
-
         </div>
 
-        <div className="sm:col-span-6 flex items-center justify-center border-b sm:border-b-0 sm:border-r border-black p-2">
 
-          <h1 className="text-xl sm:text-3xl font-bold text-center leading-tight">
-
+        {/* Company Name */}
+        <div
+          className="
+          md:col-span-6
+          flex
+          items-center
+          justify-center
+          p-4
+          border-b
+          md:border-b-0
+          md:border-r
+          border-gray-200
+          "
+        >
+          <h1
+            className="
+            text-xl
+            sm:text-2xl
+            lg:text-3xl
+            font-bold
+            text-gray-800
+            text-center
+            leading-tight
+            "
+          >
             DIETECH INDIA P LTD
-
           </h1>
-
         </div>
 
-        <div className="sm:col-span-3 text-xs sm:text-sm p-1 leading-tight">
+
+        {/* Document Details */}
+        <div
+          className="
+          md:col-span-3
+          flex
+          flex-col
+          justify-center
+          p-4
+          text-xs
+          sm:text-sm
+          text-gray-700
+          leading-relaxed
+          "
+        >
 
           <p>
-            DOC No : DT/HR/TFB/01 REV
+            <span className="font-semibold">
+              DOC No :
+            </span>{" "}
+            DT/HR/TFB/01 REV
           </p>
 
           <p>
-            No: DT:00/11.03.2015
+            <span className="font-semibold">
+              No :
+            </span>{" "}
+            DT:00/11.03.2015
           </p>
 
           <p>
-            DCR No : 954
+            <span className="font-semibold">
+              DCR No :
+            </span>{" "}
+            954
           </p>
 
         </div>
 
       </div>
 
-      <div className="text-center py-2">
 
-        <h2 className="text-lg sm:text-2xl font-bold underline leading-tight">
+      {/* Form Title */}
+      <div
+        className="
+        bg-gray-50
+        border-t
+        border-gray-200
+        text-center
+        px-4
+        py-4
+        "
+      >
 
+        <h2
+          className="
+          text-lg
+          sm:text-xl
+          lg:text-2xl
+          font-bold
+          text-gray-800
+          underline
+          "
+        >
           TRAINING - FEEDBACK FORM
-
         </h2>
 
       </div>
 
     </div>
-
   );
-
 }
 
 export default HeaderSection;

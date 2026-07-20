@@ -26,67 +26,106 @@ function SuggestionsSection({
   };
 
 
+
+  const textareaClass = `
+    w-full
+    px-3
+    py-2
+    rounded-lg
+    resize-none
+    text-sm
+    focus:outline-none
+    focus:ring-2
+    transition
+    ${
+      errors?.suggestions
+        ? "border-2 border-red-500 focus:ring-red-300"
+        : "border border-gray-300 focus:ring-gray-400"
+    }
+  `;
+
+
+
   return (
-    <table className="w-full border border-black border-collapse text-sm mt-6">
-      <tbody>
 
-        <tr>
-
-          <td className="border border-black w-10 text-center align-top p-3">
-            4
-          </td>
-
-
-          <td className="border border-black p-4">
-
-            <p className="font-semibold text-base mb-4">
-              Suggestions for improving the programme:
-            </p>
+    <div
+      className="
+      bg-white
+      rounded-xl
+      shadow-md
+      border
+      border-gray-200
+      p-4
+      md:p-6
+      mt-4
+      "
+    >
 
 
-            <textarea
 
-              name="suggestions"
+      {/* Question */}
 
-              value={formData.suggestions || ""}
-
-              onChange={handleInputChange}
-
-              rows="6"
-
-              placeholder="Share your valuable suggestions here..."
-
-              className={`w-full px-3 py-2 rounded-md focus:outline-none transition duration-200 ${
-                
-                errors?.suggestions
-
-                ? "border-2 border-red-500"
-
-                : "border border-gray-500"
-
-              }`}
-
-            />
+      <h3
+        className="
+        text-lg
+        font-bold
+        text-gray-800
+        border-b
+        border-gray-200
+        pb-3
+        mb-4
+        "
+      >
+        Suggestions for improving the programme:
+      </h3>
 
 
-            {errors?.suggestions && (
-
-              <p className="text-red-500 text-xs mt-1">
-
-                {errors.suggestions}
-
-              </p>
-
-            )}
 
 
-          </td>
+      {/* Suggestions Input */}
 
-        </tr>
+      <textarea
 
-      </tbody>
-    </table>
+        name="suggestions"
+
+        value={
+          formData.suggestions || ""
+        }
+
+        onChange={handleInputChange}
+
+        rows="6"
+
+        placeholder="Share your valuable suggestions here..."
+
+        className={textareaClass}
+
+      />
+
+
+
+      {
+        errors?.suggestions && (
+
+          <p
+            className="
+            text-red-500
+            text-xs
+            mt-1
+            "
+          >
+            {errors.suggestions}
+          </p>
+
+        )
+      }
+
+
+
+    </div>
+
   );
+
 }
 
 

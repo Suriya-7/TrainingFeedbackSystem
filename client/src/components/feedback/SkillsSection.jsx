@@ -4,58 +4,128 @@ function SkillsSection({
   errors,
   setErrors,
 }) {
+
+
   const handleInputChange = (e) => {
+
     handleChange(e);
 
     const { name } = e.target;
 
+
     if (errors[name]) {
+
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
+
     }
+
   };
 
+
+
+  const textareaClass = `
+    w-full
+    px-3
+    py-2
+    rounded-lg
+    resize-none
+    text-sm
+    focus:outline-none
+    focus:ring-2
+    transition
+    ${
+      errors?.skills
+        ? "border-2 border-red-500 focus:ring-red-300"
+        : "border border-gray-300 focus:ring-gray-400"
+    }
+  `;
+
+
+
   return (
-    <table className="w-full border border-black border-collapse text-sm mt-4">
-      <tbody>
 
-        {/* Question */}
-        <tr>
-          <td className="border border-black w-10 text-center">
-            3
-          </td>
+    <div
+      className="
+      bg-white
+      rounded-xl
+      shadow-md
+      border
+      border-gray-200
+      p-4
+      md:p-6
+      mt-4
+      "
+    >
 
-          <td className="border border-black p-2">
-            <p className="font-semibold mb-2">
-              Will you be able to use the skills learnt during the programme?
-            </p>
 
-            <textarea
-              name="skills"
-              value={formData.skills}
-              onChange={handleInputChange}
-              rows="3"
-              placeholder="Describe how you will apply the skills learnt..."
-              className={`w-full px-3 py-2 rounded-md transition duration-200 focus:outline-none ${
-                errors?.skills
-                  ? "border-2 border-red-500"
-                  : "border border-gray-500 focus:ring-1 focus:ring-gray-500"
-              }`}
-            />
 
-            {errors?.skills && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.skills}
-              </p>
-            )}
-          </td>
-        </tr>
+      {/* Question */}
 
-      </tbody>
-    </table>
+      <h3
+        className="
+        text-lg
+        font-bold
+        text-gray-800
+        border-b
+        border-gray-200
+        pb-3
+        mb-4
+        "
+      >
+        Will you be able to use the skills learnt during the programme?
+      </h3>
+
+
+
+
+      {/* Answer Area */}
+
+      <textarea
+
+        name="skills"
+
+        value={
+          formData.skills || ""
+        }
+
+        onChange={handleInputChange}
+
+        rows="4"
+
+        placeholder="Describe how you will apply the skills learnt..."
+
+        className={textareaClass}
+
+      />
+
+
+
+      {
+        errors?.skills && (
+
+          <p
+            className="
+            text-red-500
+            text-xs
+            mt-1
+            "
+          >
+            {errors.skills}
+          </p>
+
+        )
+      }
+
+
+
+    </div>
+
   );
+
 }
+
 
 export default SkillsSection;

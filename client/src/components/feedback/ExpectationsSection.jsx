@@ -5,22 +5,25 @@ function ExpectationsSection({
   setErrors,
 }) {
 
-const handleInputChange = (e) => {
 
-  const { name } = e.target;
+  const handleInputChange = (e) => {
 
-  handleChange(e);
+    const { name } = e.target;
 
-  if (errors[name]) {
+    handleChange(e);
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
 
-  }
+    if (errors[name]) {
 
-};
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+
+    }
+
+  };
+
 
 
   const handleExpectationChange = (e) => {
@@ -28,6 +31,7 @@ const handleInputChange = (e) => {
     const { value } = e.target;
 
     handleChange(e);
+
 
 
     if (value === "Yes") {
@@ -39,6 +43,7 @@ const handleInputChange = (e) => {
         },
       });
 
+
       setErrors((prev) => ({
         ...prev,
         expectation: "",
@@ -46,6 +51,7 @@ const handleInputChange = (e) => {
       }));
 
     }
+
 
 
     if (value === "No") {
@@ -69,183 +75,335 @@ const handleInputChange = (e) => {
   };
 
 
+
+  const textareaClass = (field) =>
+    `
+    w-full
+    px-3
+    py-2
+    rounded-lg
+    resize-none
+    text-sm
+    focus:outline-none
+    focus:ring-2
+    transition
+    ${
+      errors?.[field]
+        ? "border-2 border-red-500 focus:ring-red-300"
+        : "border border-gray-300 focus:ring-gray-400"
+    }
+    `;
+
+
+
   return (
 
-    <table className="w-full border border-black border-collapse text-sm mt-4">
-
-      <tbody>
-
-        <tr>
-
-          <td className="border border-black p-2 w-10 text-center">
-            2
-          </td>
-
-          <td className="border border-black p-2">
-
-            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
-
-              <span className="font-semibold">
-                Were your expectations met?
-              </span>
-
-              <div className="flex gap-6">
-
-                <label className="flex items-center gap-2 cursor-pointer">
-
-                  <input
-                    type="radio"
-                    name="expectation"
-                    value="Yes"
-                    checked={formData.expectation === "Yes"}
-                    onChange={handleExpectationChange}
-                    className="w-4 h-4 accent-gray-700"
-                  />
-
-                  Yes
-
-                </label>
+    <div
+      className="
+      bg-white
+      rounded-xl
+      shadow-md
+      border
+      border-gray-200
+      p-4
+      md:p-6
+      mt-4
+      "
+    >
 
 
-                <label className="flex items-center gap-2 cursor-pointer">
+      {/* Question Section */}
 
-                  <input
-                    type="radio"
-                    name="expectation"
-                    value="No"
-                    checked={formData.expectation === "No"}
-                    onChange={handleExpectationChange}
-                    className="w-4 h-4 accent-gray-700"
-                  />
-
-                  No
-
-                </label>
-
-              </div>
-
-            </div>
-
-
-            {errors?.expectation && (
-
-              <p className="text-red-500 text-xs mt-2">
-                {errors.expectation}
-              </p>
-
-            )}
-
-          </td>
-
-        </tr>
+      <div
+        className={`
+        flex
+        flex-col
+        md:flex-row
+        md:items-center
+        md:justify-between
+        gap-4
+        pb-4
+        ${
+          errors?.expectation
+            ? "border-b border-red-500"
+            : "border-b border-gray-200"
+        }
+        `}
+      >
 
 
-        {formData.expectation === "Yes" && (
-
-          <tr>
-
-            <td className="border border-black text-center">
-              a
-            </td>
-
-
-            <td className="border border-black p-2">
-
-              <p className="mb-2">
-                Please list major areas of your learning:
-              </p>
+        <h3
+          className="
+          text-lg
+          font-bold
+          text-gray-800
+          "
+        >
+          Were your expectations met?
+        </h3>
 
 
-              <textarea
 
-                name="expectationYes"
-
-                value={formData.expectationYes || ""}
-
-                onChange={handleInputChange}
-
-                rows="3"
-
-                placeholder="Enter your learning..."
-
-                className={`w-full px-3 py-2 rounded-md focus:outline-none resize-none ${
-                  errors?.expectationYes
-                    ? "border-2 border-red-500"
-                    : "border border-gray-500"
-                }`}
-
-              />
+        <div
+          className="
+          flex
+          gap-6
+          "
+        >
 
 
-              {errors?.expectationYes && (
+          <label
+            className="
+            flex
+            items-center
+            gap-2
+            cursor-pointer
+            text-sm
+            text-gray-700
+            "
+          >
 
-                <p className="text-red-500 text-xs mt-1">
+            <input
+
+              type="radio"
+
+              name="expectation"
+
+              value="Yes"
+
+              checked={
+                formData.expectation === "Yes"
+              }
+
+              onChange={handleExpectationChange}
+
+              className="
+              w-4
+              h-4
+              accent-gray-700
+              cursor-pointer
+              "
+
+            />
+
+            Yes
+
+          </label>
+
+
+
+          <label
+            className="
+            flex
+            items-center
+            gap-2
+            cursor-pointer
+            text-sm
+            text-gray-700
+            "
+          >
+
+            <input
+
+              type="radio"
+
+              name="expectation"
+
+              value="No"
+
+              checked={
+                formData.expectation === "No"
+              }
+
+              onChange={handleExpectationChange}
+
+              className="
+              w-4
+              h-4
+              accent-gray-700
+              cursor-pointer
+              "
+
+            />
+
+            No
+
+          </label>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      {
+        errors?.expectation && (
+
+          <p
+            className="
+            text-red-500
+            text-xs
+            mt-2
+            "
+          >
+            {errors.expectation}
+          </p>
+
+        )
+      }
+
+
+
+
+
+      {/* Yes Response */}
+
+      {
+        formData.expectation === "Yes" && (
+
+          <div
+            className="
+            mt-4
+            "
+          >
+
+            <label
+              className="
+              block
+              text-sm
+              font-semibold
+              text-gray-700
+              mb-2
+              "
+            >
+              Please list major areas of your learning:
+            </label>
+
+
+
+            <textarea
+
+              name="expectationYes"
+
+              value={
+                formData.expectationYes || ""
+              }
+
+              onChange={handleInputChange}
+
+              rows="4"
+
+              placeholder="Enter your learning..."
+
+              className={
+                textareaClass("expectationYes")
+              }
+
+            />
+
+
+
+            {
+              errors?.expectationYes && (
+
+                <p
+                  className="
+                  text-red-500
+                  text-xs
+                  mt-1
+                  "
+                >
                   {errors.expectationYes}
                 </p>
 
-              )}
-
-            </td>
-
-          </tr>
-
-        )}
+              )
+            }
 
 
-        {formData.expectation === "No" && (
+          </div>
 
-          <tr>
-
-            <td className="border border-black text-center">
-              b
-            </td>
+        )
+      }
 
 
-            <td className="border border-black p-2">
-
-              <p className="mb-2">
-                Please give reasons:
-              </p>
 
 
-              <textarea
-
-                name="expectationNo"
-
-                value={formData.expectationNo || ""}
-
-                onChange={handleInputChange}
-
-                rows="3"
-
-                placeholder="Enter the reason..."
-
-                className={`w-full px-3 py-2 rounded-md focus:outline-none resize-none ${
-                  errors?.expectationNo
-                    ? "border-2 border-red-500"
-                    : "border border-gray-500"
-                }`}
-
-              />
 
 
-              {errors?.expectationNo && (
+      {/* No Response */}
 
-                <p className="text-red-500 text-xs mt-1">
+      {
+        formData.expectation === "No" && (
+
+          <div
+            className="
+            mt-4
+            "
+          >
+
+            <label
+              className="
+              block
+              text-sm
+              font-semibold
+              text-gray-700
+              mb-2
+              "
+            >
+              Please give reasons:
+            </label>
+
+
+
+            <textarea
+
+              name="expectationNo"
+
+              value={
+                formData.expectationNo || ""
+              }
+
+              onChange={handleInputChange}
+
+              rows="4"
+
+              placeholder="Enter the reason..."
+
+              className={
+                textareaClass("expectationNo")
+              }
+
+            />
+
+
+
+            {
+              errors?.expectationNo && (
+
+                <p
+                  className="
+                  text-red-500
+                  text-xs
+                  mt-1
+                  "
+                >
                   {errors.expectationNo}
                 </p>
 
-              )}
+              )
+            }
 
-            </td>
 
-          </tr>
+          </div>
 
-        )}
+        )
+      }
 
-      </tbody>
 
-    </table>
+
+    </div>
 
   );
 

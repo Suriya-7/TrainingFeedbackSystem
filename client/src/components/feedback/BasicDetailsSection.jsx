@@ -5,6 +5,7 @@ function BasicDetailsSection({
   setErrors,
 }) {
 
+
   const handleInputChange = (e) => {
 
     handleChange(e);
@@ -24,178 +25,183 @@ function BasicDetailsSection({
 
 
   const inputClass = (field) =>
-    `w-full px-2 py-1 rounded-sm text-sm focus:outline-none ${
+    `
+    w-full
+    px-3
+    py-2
+    text-sm
+    rounded-lg
+    border
+    focus:outline-none
+    focus:ring-2
+    transition
+    ${
       errors?.[field]
-        ? "border border-red-500"
-        : "border border-gray-400 focus:ring-1 focus:ring-gray-400"
-    }`;
+        ? "border-red-500 focus:ring-red-300"
+        : "border-gray-300 focus:ring-gray-400"
+    }
+    `;
+
+
+  const fields = [
+
+    {
+      label: "Participant's Name",
+      name: "participantName",
+      type: "text",
+      placeholder: "Enter Your Name",
+    },
+
+    {
+      label: "Emp. No",
+      name: "employeeNo",
+      type: "text",
+      placeholder: "Employee ID",
+    },
+
+    {
+      label: "Department",
+      name: "department",
+      type: "text",
+      placeholder: "Department",
+    },
+
+    {
+      label: "Date",
+      name: "date",
+      type: "date",
+    },
+
+    {
+      label: "Course / Programme",
+      name: "course",
+      type: "text",
+      placeholder: "Enter course/programme",
+      fullWidth: true,
+    },
+
+  ];
+
 
 
   return (
 
-    <table className="mt-3 w-full border border-black border-collapse text-sm">
+    <div
+      className="
+      bg-white
+      rounded-xl
+      shadow-md
+      border
+      border-gray-200
+      p-4
+      md:p-6
+      mt-4
+      "
+    >
 
-      <tbody>
 
-        <tr>
+      {/* Section Title */}
+      <h3
+        className="
+        text-lg
+        font-bold
+        text-gray-800
+        mb-5
+        border-b
+        border-gray-200
+        pb-2
+        "
+      >
+        Employee Details
+      </h3>
 
-          <td className="border border-black p-2">
 
-            <div className="flex items-center gap-2">
 
-              <label className="font-semibold whitespace-nowrap w-36">
-                Participant's Name:
+      <div
+        className="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        gap-4
+        "
+      >
+
+
+        {
+          fields.map((field) => (
+
+            <div
+              key={field.name}
+              className={
+                field.fullWidth
+                  ? "md:col-span-2"
+                  : ""
+              }
+            >
+
+              <label
+                className="
+                block
+                text-sm
+                font-semibold
+                text-gray-700
+                mb-2
+                "
+              >
+                {field.label}
               </label>
 
+
               <input
-                type="text"
-                name="participantName"
-                value={formData.participantName}
+
+                type={field.type}
+
+                name={field.name}
+
+                value={formData[field.name]}
+
                 onChange={handleInputChange}
-                placeholder="Enter Your Name"
-                className={inputClass("participantName")}
+
+                placeholder={field.placeholder}
+
+                className={
+                  inputClass(field.name)
+                }
+
               />
+
+
+              {
+                errors?.[field.name] && (
+
+                  <p
+                    className="
+                    text-red-500
+                    text-xs
+                    mt-1
+                    "
+                  >
+                    {errors[field.name]}
+                  </p>
+
+                )
+              }
+
 
             </div>
 
-            {errors?.participantName && (
-              <p className="text-red-500 text-xs mt-0.5 ml-36">
-                {errors.participantName}
-              </p>
-            )}
-
-          </td>
+          ))
+        }
 
 
-          <td className="border border-black p-2">
-
-            <div className="flex items-center gap-2">
-
-              <label className="font-semibold whitespace-nowrap">
-                Emp. No:
-              </label>
-
-              <input
-                type="text"
-                name="employeeNo"
-                value={formData.employeeNo}
-                onChange={handleInputChange}
-                placeholder="Employee ID"
-                className={inputClass("employeeNo")}
-              />
-
-            </div>
-
-            {errors?.employeeNo && (
-              <p className="text-red-500 text-xs mt-0.5">
-                {errors.employeeNo}
-              </p>
-            )}
-
-          </td>
-
-        </tr>
+      </div>
 
 
-        <tr>
-
-          <td className="border border-black p-2">
-
-            <div className="flex items-center gap-2">
-
-              <label className="font-semibold whitespace-nowrap w-36">
-                Department:
-              </label>
-
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-                placeholder="Department"
-                className={inputClass("department")}
-              />
-
-            </div>
-
-            {errors?.department && (
-              <p className="text-red-500 text-xs mt-0.5 ml-36">
-                {errors.department}
-              </p>
-            )}
-
-          </td>
-
-
-          <td className="border border-black p-2">
-
-            <div className="flex items-center gap-2">
-
-              <label className="font-semibold whitespace-nowrap">
-                Date:
-              </label>
-
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                className={inputClass("date")}
-              />
-
-            </div>
-
-            {errors?.date && (
-              <p className="text-red-500 text-xs mt-0.5">
-                {errors.date}
-              </p>
-            )}
-
-          </td>
-
-        </tr>
-
-
-        <tr>
-
-          <td
-            colSpan="2"
-            className="border border-black p-2"
-          >
-
-            <div className="flex items-center gap-2">
-
-              <label className="font-semibold whitespace-nowrap w-36">
-                Course / Programme:
-              </label>
-
-              <input
-                type="text"
-                name="course"
-                value={formData.course}
-                onChange={handleInputChange}
-                placeholder="Enter course/programme"
-                className={inputClass("course")}
-              />
-
-            </div>
-
-            {errors?.course && (
-              <p className="text-red-500 text-xs mt-0.5 ml-36">
-                {errors.course}
-              </p>
-            )}
-
-          </td>
-
-        </tr>
-
-      </tbody>
-
-    </table>
+    </div>
 
   );
 
 }
+
 
 export default BasicDetailsSection;
