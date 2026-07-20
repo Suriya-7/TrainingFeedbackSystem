@@ -5,26 +5,18 @@ function SkillsSection({
   setErrors,
 }) {
 
-
   const handleInputChange = (e) => {
-
     handleChange(e);
 
     const { name } = e.target;
 
-
     if (errors[name]) {
-
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
-
     }
-
   };
-
-
 
   const textareaClass = `
     w-full
@@ -43,89 +35,28 @@ function SkillsSection({
     }
   `;
 
-
-
   return (
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-5 mt-3">
 
-    <div
-      className="
-      bg-white
-      rounded-xl
-      shadow-md
-      border
-      border-gray-200
-      p-4
-      md:p-6
-      mt-4
-      "
-    >
-
-
-
-      {/* Question */}
-
-      <h3
-        className="
-        text-lg
-        font-bold
-        text-gray-800
-        border-b
-        border-gray-200
-        pb-3
-        mb-4
-        "
-      >
+      <h3 className="text-base font-bold text-gray-800 border-b border-gray-200 pb-2 mb-3">
         Will you be able to use the skills learnt during the programme?
       </h3>
 
-
-
-
-      {/* Answer Area */}
-
       <textarea
-
         name="skills"
-
-        value={
-          formData.skills || ""
-        }
-
+        value={formData.skills || ""}
         onChange={handleInputChange}
-
-        rows="4"
-
+        rows="3"
         placeholder="Describe how you will apply the skills learnt..."
-
         className={textareaClass}
-
       />
 
-
-
-      {
-        errors?.skills && (
-
-          <p
-            className="
-            text-red-500
-            text-xs
-            mt-1
-            "
-          >
-            {errors.skills}
-          </p>
-
-        )
-      }
-
-
+      {errors?.skills && (
+        <p className="text-red-500 text-xs mt-1">{errors.skills}</p>
+      )}
 
     </div>
-
   );
-
 }
-
 
 export default SkillsSection;

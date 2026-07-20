@@ -30,20 +30,20 @@ function RatingSection({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-6 mt-4">
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-5 mt-3">
 
-      <h3 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-3 mb-5">
+      <h3 className="text-base font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         Comment on the following
       </h3>
 
-      <div className="space-y-4">
+      <div className="space-y-2.5">
         {ratingItems.map((item) => (
           <div
             key={item.name}
             className={`
             flex flex-col sm:flex-row sm:items-center sm:justify-between
-            gap-3 sm:gap-4
-            rounded-lg border p-4
+            gap-2 sm:gap-4
+            rounded-lg border p-3
             ${errors?.[item.name] ? "border-red-500 bg-red-50" : "border-gray-200"}
             `}
           >
@@ -53,11 +53,11 @@ function RatingSection({
                 {item.label}
               </p>
               {errors?.[item.name] && (
-                <p className="text-red-500 text-xs mt-1">{errors[item.name]}</p>
+                <p className="text-red-500 text-xs mt-0.5">{errors[item.name]}</p>
               )}
             </div>
 
-            <div className="flex flex-wrap gap-x-6 gap-y-2 sm:justify-end">
+            <div className="flex flex-wrap gap-x-6 gap-y-1.5 sm:justify-end">
               {ratings.map((rating) => (
                 <label
                   key={rating}

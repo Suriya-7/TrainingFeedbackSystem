@@ -152,8 +152,8 @@ function FeedbackForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-2 py-5 sm:px-4 sm:py-8">
-      <div className="mx-auto w-full max-w-[210mm] overflow-hidden rounded-lg bg-white p-3 shadow-xl sm:p-6">
+    <div className="min-h-screen bg-gray-100 px-3 py-4 sm:px-4 sm:py-6">
+      <div className="mx-auto w-full max-w-[210mm] overflow-hidden rounded-lg bg-white p-3 shadow-xl sm:p-5">
         <HeaderSection />
         <BasicDetailsSection
           formData={formData}

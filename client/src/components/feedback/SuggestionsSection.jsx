@@ -5,27 +5,18 @@ function SuggestionsSection({
   setErrors,
 }) {
 
-
   const handleInputChange = (e) => {
-
     const { name } = e.target;
-
 
     handleChange(e);
 
-
     if (errors[name]) {
-
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
-
     }
-
   };
-
-
 
   const textareaClass = `
     w-full
@@ -44,89 +35,28 @@ function SuggestionsSection({
     }
   `;
 
-
-
   return (
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-5 mt-3">
 
-    <div
-      className="
-      bg-white
-      rounded-xl
-      shadow-md
-      border
-      border-gray-200
-      p-4
-      md:p-6
-      mt-4
-      "
-    >
-
-
-
-      {/* Question */}
-
-      <h3
-        className="
-        text-lg
-        font-bold
-        text-gray-800
-        border-b
-        border-gray-200
-        pb-3
-        mb-4
-        "
-      >
+      <h3 className="text-base font-bold text-gray-800 border-b border-gray-200 pb-2 mb-3">
         Suggestions for improving the programme:
       </h3>
 
-
-
-
-      {/* Suggestions Input */}
-
       <textarea
-
         name="suggestions"
-
-        value={
-          formData.suggestions || ""
-        }
-
+        value={formData.suggestions || ""}
         onChange={handleInputChange}
-
-        rows="6"
-
+        rows="4"
         placeholder="Share your valuable suggestions here..."
-
         className={textareaClass}
-
       />
 
-
-
-      {
-        errors?.suggestions && (
-
-          <p
-            className="
-            text-red-500
-            text-xs
-            mt-1
-            "
-          >
-            {errors.suggestions}
-          </p>
-
-        )
-      }
-
-
+      {errors?.suggestions && (
+        <p className="text-red-500 text-xs mt-1">{errors.suggestions}</p>
+      )}
 
     </div>
-
   );
-
 }
-
 
 export default SuggestionsSection;
