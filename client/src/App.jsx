@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import EmployeeFeedback from "./pages/EmployeeFeedback";
 import AdminLogin from "./pages/AdminLogin";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/AdminDashboard";
 import ViewFeedback from "./pages/ViewFeedback";
 import NotFound from "./pages/NotFound";
 
