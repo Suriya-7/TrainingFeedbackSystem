@@ -5,7 +5,7 @@ import {
   getFeedbackById,
   deleteFeedback,
 } from "../controllers/adminController.js";
-
+import {generateFeedbackPDF} from "../controllers/pdfController.js";
 import  protect  from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -28,5 +28,8 @@ router.get("/feedbacks/:id", protect, getFeedbackById);
 
 // Delete feedback
 router.delete("/feedbacks/:id", protect, deleteFeedback);
+
+// Generate PDF for feedback
+router.get("/feedbacks/:id/pdf", protect, generateFeedbackPDF);
 
 export default router;
