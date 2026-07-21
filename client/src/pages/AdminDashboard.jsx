@@ -1,64 +1,178 @@
+import { useState } from "react";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+
 import AdminNavbar from "../components/admin/AdminNavbar";
 import SearchFilterBar from "../components/admin/SearchFilterBar";
 import FeedbackTable from "../components/admin/FeedbackTable";
 import Pagination from "../components/admin/Pagination";
+import FeedbackModal from "../components/admin/FeedbackModal";
+
 import useFeedbacks from "../hooks/useFeedbacks";
+import adminApi from "../services/adminApi";
 
 function AdminDashboard() {
   const {
-  feedbacks,
-  totalFeedbacks,
-  loading,
-  refreshFeedbacks,
+    feedbacks,
+    totalFeedbacks,
+    loading,
+    refreshFeedbacks,
 
-  searchTerm,
-  setSearchTerm,
+    searchTerm,
+    setSearchTerm,
 
-  departments,
-  selectedDepartment,
-  setSelectedDepartment,
+    departments,
+    selectedDepartment,
+    setSelectedDepartment,
 
-  currentPage,
-  totalPages,
-  goToPage,
+    currentPage,
+    totalPages,
+    goToPage,
+  } = useFeedbacks();
 
-} = useFeedbacks();
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
+
+  // Delete Logic
+
+  const handleDelete = async (feedback) => {
+    const result = await Swal.fire({
+      title: "Delete Feedback?",
+
+      text: "This action cannot be undone.",
+
+      icon: "warning",
+
+      showCancelButton: true,
+
+      confirmButtonText: "Yes, Delete",
+
+      cancelButtonText: "Cancel",
+
+      confirmButtonColor: "#dc2626",
+
+      cancelButtonColor: "#6b7280",
+
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await adminApi.deleteFeedback(feedback._id);
+
+      await Swal.fire({
+        title: "Deleted!",
+
+        text: "Feedback deleted successfully.",
+
+        icon: "success",
+
+        timer: 1500,
+
+        showConfirmButton: false,
+      });
+
+      refreshFeedbacks();
+    } catch (error) {
+      console.error(error);
+
+      Swal.fire({
+        title: "Error",
+
+        text: error.response?.data?.message || "Failed to delete feedback.",
+
+        icon: "error",
+      });
+    }
+  };
+
+  // Download Logic
+
+  const handleDownload = (feedback) => {
+    console.log("Download PDF:", feedback);
+
+    toast.info("PDF download feature coming next.");
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Navbar */}
 
       <AdminNavbar
         totalFeedbacks={totalFeedbacks}
+
         onRefresh={refreshFeedbacks}
+
         loading={loading}
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Main Content */}
+
+      <main
+        className="
+          max-w-7xl
+          mx-auto
+          px-4
+          md:px-6
+          py-6
+        "
+      >
+        {/* Search + Filter */}
 
         <SearchFilterBar
           searchTerm={searchTerm}
+
           onSearch={setSearchTerm}
+
           departments={departments}
+
           selectedDepartment={selectedDepartment}
+
           onDepartmentChange={setSelectedDepartment}
         />
 
+        {/* Feedback Table */}
+
         <FeedbackTable
           feedbacks={feedbacks}
+
           loading={loading}
-          onView={(feedback) => console.log("View:", feedback)}
-          onDelete={(feedback) => console.log("Delete:", feedback)}
-          onDownload={(feedback) => console.log("Download:", feedback)}
+
+          onView={(feedback) => {
+            setSelectedFeedback(feedback);
+          }}
+
+          onDelete={handleDelete}
+
+          onDownload={handleDownload}
         />
 
+        {/* Pagination */}
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={goToPage}
-/>
-      </div>
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
 
+              totalPages={totalPages}
+
+              onPageChange={goToPage}
+            />
+          </div>
+        )}
+      </main>
+
+      {/* Feedback Details Modal */}
+
+      {selectedFeedback && (
+        <FeedbackModal
+          feedback={selectedFeedback}
+
+          onClose={() => {
+            setSelectedFeedback(null);
+          }}
+        />
+      )}
     </div>
   );
 }
