@@ -12,9 +12,9 @@ function App() {
       <Routes>
         <Route path="/" element={<EmployeeFeedback />} />
 
-        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
 
         <Route path="/view/:id" element={<ViewFeedback />} />
 

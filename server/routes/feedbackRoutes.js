@@ -5,19 +5,22 @@ import {
   getFeedbackById,
   deleteFeedback,
 } from "../controllers/feedbackController.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Create Feedback
+// ================================
+// Public Route (Employee)
+// ================================
 router.post("/", createFeedback);
 
-// Get All Feedback
-router.get("/", getAllFeedback);
+// ================================
+// Protected Routes (Admin)
+// ================================
+router.get("/", protect, getAllFeedback);
 
-// Get Single Feedback
-router.get("/:id", getFeedbackById);
+router.get("/:id", protect, getFeedbackById);
 
-// Delete Feedback
-router.delete("/:id", deleteFeedback);
+router.delete("/:id", protect, deleteFeedback);
 
 export default router;
