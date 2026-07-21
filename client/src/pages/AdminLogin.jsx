@@ -126,13 +126,6 @@ function AdminLogin() {
           </button>
 
         </form>
-<button
-  type="button"
-  onClick={() => toast.success("Toast Working")}
-  className="bg-green-600 text-white px-4 py-2 rounded"
->
-  Test Toast
-</button>
       </div>
     </div>
     
