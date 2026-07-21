@@ -1,263 +1,59 @@
-import { useState } from "react";
-import { Search, RotateCcw, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 
-function SearchFilterBar({ onSearch, departments = [], courses = [] }) {
-  const [filters, setFilters] = useState({
-    keyword: "",
-
-    department: "",
-
-    course: "",
-
-    dateFrom: "",
-
-    dateTo: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFilters((prev) => ({
-      ...prev,
-
-      [name]: value,
-    }));
-  };
-
-  const handleSearch = () => {
-    onSearch(filters);
-  };
-
-  const handleClear = () => {
-    const clearData = {
-      keyword: "",
-
-      department: "",
-
-      course: "",
-
-      dateFrom: "",
-
-      dateTo: "",
-    };
-
-    setFilters(clearData);
-
-    onSearch(clearData);
-  };
-
-  const inputClass = `
-    w-full
-    border
-    border-gray-300
-    rounded-lg
-    px-3
-    py-2
-    text-sm
-    outline-none
-    focus:ring-2
-    focus:ring-gray-800
-  `;
-
+function SearchFilterBar({
+  searchTerm,
+  onSearch,
+  departments,
+  selectedDepartment,
+  onDepartmentChange,
+}) {
   return (
-    <div
-      className="
-      bg-white
-      border
-      border-gray-200
-      shadow-sm
-      rounded-xl
-      p-4
-      mb-5
-      "
-    >
-      {/* Header */}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 mb-6">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
 
-      <div
-        className="
-        flex
-        items-center
-        gap-2
-        mb-4
-        "
-      >
-        <div
-          className="
-          bg-gray-900
-          text-white
-          p-1.5
-          rounded-lg
-          "
-        >
-          <Filter size={15} />
-        </div>
-
-        <h3
-          className="
-          text-sm
-          font-semibold
-          text-gray-800
-          "
-        >
-          Search & Filter
-        </h3>
-      </div>
-
-      <div
-        className="
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        lg:grid-cols-6
-        gap-3
-        "
-      >
         {/* Search */}
+        <div className="relative flex-1">
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          />
 
-        <div className="lg:col-span-2">
-          <div className="relative">
-            <Search
-              size={15}
-              className="
-              absolute
-              left-3
-              top-2.5
-              text-gray-400
-              "
-            />
-
-            <input
-              type="text"
-
-              name="keyword"
-
-              value={filters.keyword}
-
-              onChange={handleChange}
-
-              placeholder="Name / Employee No"
-
-              className={`
-                ${inputClass}
-                pl-9
-              `}
-            />
-          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder="Search by participant, employee no or course..."
+            className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition"
+          />
         </div>
 
-        {/* Department */}
+        {/* Department Filter */}
+        <div className="w-full lg:w-72">
+          <select
+            value={selectedDepartment}
+            onChange={(e) => onDepartmentChange(e.target.value)}
+            className="
+              w-full
+              px-4
+              py-3
+              border
+              border-gray-300
+              rounded-xl
+              bg-white
+              focus:outline-none
+              focus:ring-2
+              focus:ring-black
+              transition
+            "
+          >
+            {departments.map((department) => (
+              <option key={department} value={department}>
+                {department}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          name="department"
-
-          value={filters.department}
-
-          onChange={handleChange}
-
-          className={inputClass}
-        >
-          <option value="">All Departments</option>
-
-          {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
-            </option>
-          ))}
-        </select>
-
-        {/* Course */}
-
-        <select
-          name="course"
-
-          value={filters.course}
-
-          onChange={handleChange}
-
-          className={inputClass}
-        >
-          <option value="">All Courses</option>
-
-          {courses.map((course) => (
-            <option key={course} value={course}>
-              {course}
-            </option>
-          ))}
-        </select>
-
-        {/* From */}
-
-        <input
-          type="date"
-
-          name="dateFrom"
-
-          value={filters.dateFrom}
-
-          onChange={handleChange}
-
-          className={inputClass}
-        />
-
-        {/* To */}
-
-        <input
-          type="date"
-
-          name="dateTo"
-
-          value={filters.dateTo}
-
-          onChange={handleChange}
-
-          className={inputClass}
-        />
-      </div>
-
-      {/* Buttons */}
-
-      <div
-        className="
-        flex
-        justify-end
-        gap-2
-        mt-4
-        "
-      >
-        <button
-          onClick={handleClear}
-
-          className="
-          flex
-          items-center
-          gap-1
-          px-4
-          py-2
-          rounded-lg
-          text-sm
-          bg-gray-100
-          hover:bg-gray-200
-          "
-        >
-          <RotateCcw size={14} />
-          Clear
-        </button>
-
-        <button
-          onClick={handleSearch}
-
-          className="
-          px-5
-          py-2
-          rounded-lg
-          text-sm
-          bg-gray-900
-          hover:bg-black
-          text-white
-          "
-        >
-          Search
-        </button>
       </div>
     </div>
   );

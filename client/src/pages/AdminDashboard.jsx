@@ -1,114 +1,64 @@
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import api from "../services/api";
-
 import AdminNavbar from "../components/admin/AdminNavbar";
 import SearchFilterBar from "../components/admin/SearchFilterBar";
 import FeedbackTable from "../components/admin/FeedbackTable";
 import Pagination from "../components/admin/Pagination";
+import useFeedbacks from "../hooks/useFeedbacks";
 
 function AdminDashboard() {
-  const [reports, setReports] = useState([]);
+  const {
+  feedbacks,
+  totalFeedbacks,
+  loading,
+  refreshFeedbacks,
 
-  const [currentPage, setCurrentPage] = useState(1);
+  searchTerm,
+  setSearchTerm,
 
-  // Dropdown Data
+  departments,
+  selectedDepartment,
+  setSelectedDepartment,
 
-  const [departments, setDepartments] = useState([]);
+  currentPage,
+  totalPages,
+  goToPage,
 
-  const [courses, setCourses] = useState([]);
-
-  const totalPages = 1;
-
-  const fetchReports = useCallback(async (filters = {}) => {
-    try {
-      const response = await api.get("/feedback", {
-        params: filters,
-      });
-
-      const data = response.data;
-
-      if (data.success) {
-        const feedbackData = data.data || [];
-
-        setReports(feedbackData);
-
-        // Extract Departments
-
-        const uniqueDepartments = [
-          ...new Set(
-            feedbackData
-
-              .map((item) => item.department)
-
-              .filter(Boolean),
-          ),
-        ];
-
-        setDepartments(uniqueDepartments);
-
-        // Extract Courses
-
-        const uniqueCourses = [
-          ...new Set(
-            feedbackData
-
-              .map((item) => item.course)
-
-              .filter(Boolean),
-          ),
-        ];
-
-        setCourses(uniqueCourses);
-      }
-    } catch (error) {
-      console.log(
-        "Feedback API Error:",
-
-        error.response?.data || error.message,
-      );
-
-      toast.error("Unable to fetch reports");
-    }
-  }, []);
-
-  useEffect(() => {
-    const loadReports = async () => {
-      await fetchReports();
-    };
-
-    loadReports();
-  }, [fetchReports]);
+} = useFeedbacks();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNavbar />
+    <div className="min-h-screen bg-gray-100">
 
-      <main
-        className="
-        p-4
-        sm:p-6
-        lg:p-8
-        "
-      >
+      <AdminNavbar
+        totalFeedbacks={totalFeedbacks}
+        onRefresh={refreshFeedbacks}
+        loading={loading}
+      />
+
+      <div className="max-w-7xl mx-auto px-6 py-6">
+
         <SearchFilterBar
-          onSearch={fetchReports}
-
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
           departments={departments}
-
-          courses={courses}
+          selectedDepartment={selectedDepartment}
+          onDepartmentChange={setSelectedDepartment}
         />
 
-        <FeedbackTable reports={reports} />
+        <FeedbackTable
+          feedbacks={feedbacks}
+          loading={loading}
+          onView={(feedback) => console.log("View:", feedback)}
+          onDelete={(feedback) => console.log("Delete:", feedback)}
+          onDownload={(feedback) => console.log("Download:", feedback)}
+        />
+
 
         <Pagination
           currentPage={currentPage}
-
           totalPages={totalPages}
+          onPageChange={goToPage}
+/>
+      </div>
 
-          onPageChange={setCurrentPage}
-        />
-      </main>
     </div>
   );
 }

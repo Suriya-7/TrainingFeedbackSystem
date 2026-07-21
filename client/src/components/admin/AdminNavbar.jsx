@@ -1,136 +1,130 @@
-import logo from "../../assets/dietech-logo.png";
-import { LogOut } from "lucide-react";
+import {
+  RotateCw,
+  LogOut,
+  Building2,
+  Database,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-function AdminNavbar() {
+import authService from "../../services/authService";
+
+function AdminNavbar({
+  totalFeedbacks = 0,
+  onRefresh,
+  loading = false,
+}) {
+    const feedbackCount = Number(totalFeedbacks) || 0;
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
+    authService.logout();
 
-    window.location.href = "/admin/login";
+    toast.success("Logged out successfully.");
+
+    navigate("/admin/login", {
+      replace: true,
+    });
   };
 
   return (
-    <nav
-      className="
-        px-4
-        sm:px-6
-        lg:px-8
-        py-4
-      "
-    >
-      <div
-        className="
-          max-w-7xl
-          mx-auto
-          flex
-          items-center
-          justify-between
-        "
-      >
-        {/* Left Section */}
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6">
 
-        <div
-          className="
-            flex
-            items-center
-            gap-3
-            sm:gap-4
-          "
-        >
-          {/* Logo */}
+        <div className="min-h-16 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
 
-          <div
-            className="
-              bg-gray-50
-              border
-              border-gray-200
-              rounded-xl
-              p-2
-              flex
-              items-center
-              justify-center
-            "
-          >
-            <img
-              src={logo}
-              alt="DIETECH Logo"
-              className="
-                w-20
-                h-20
-                sm:w-12
-                sm:h-12
-                object-contain
-              "
-            />
+          {/* Left */}
+          <div className="flex items-center gap-3">
+
+            <div className="w-11 h-11 rounded-xl bg-black text-white flex items-center justify-center">
+              <Building2 size={22} />
+            </div>
+
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">
+                Training Feedback System
+              </h1>
+
+              <p className="text-sm text-gray-500">
+                Dietech India Pvt. Ltd.
+              </p>
+            </div>
+
           </div>
 
-          {/* Company Details */}
+          {/* Right */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
 
-          <div className="leading-tight">
-            <h1
+            {/* Total Feedback */}
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl border border-gray-200 bg-gray-50">
+
+              <div className="w-10 h-10 rounded-lg bg-black text-white flex items-center justify-center">
+                <Database size={18} />
+              </div>
+
+              <div>
+                <p className="text-xs uppercase text-gray-500 tracking-wide">
+                  Total Feedback
+                </p>
+
+                <p className="text-lg font-bold text-gray-900">
+                    {feedbackCount}
+                </p>
+              </div>
+
+            </div>
+
+            {/* Refresh */}
+            <button
+              onClick={onRefresh}
+              disabled={loading}
               className="
-                text-lg
-                sm:text-xl
-                font-bold
-                text-gray-800
-                tracking-wide
+                flex
+                items-center
+                gap-2
+                px-4
+                py-2
+                rounded-xl
+                border
+                border-gray-300
+                hover:bg-gray-100
+                transition
+                disabled:opacity-50
+                disabled:cursor-not-allowed
               "
             >
-              DIETECH
-            </h1>
+              <RotateCw
+                size={18}
+                className={loading ? "animate-spin" : ""}
+              />
 
-            <p
+              {loading ? "Refreshing..." : "Refresh"}
+            </button>
+
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
               className="
-                text-xs
-                sm:text-sm
-                text-gray-500
-                mt-1
+                flex
+                items-center
+                gap-2
+                px-4
+                py-2
+                rounded-xl
+                bg-red-600
+                text-white
+                hover:bg-red-700
+                transition
               "
             >
-              Admin Dashboard
-            </p>
+              <LogOut size={18} />
+              Logout
+            </button>
+
           </div>
+
         </div>
 
-        {/* Right Section */}
-
-        <button
-          onClick={handleLogout}
-          className="
-            flex
-            items-center
-            gap-2
-
-            bg-gray-900
-            hover:bg-black
-
-            text-white
-
-            px-4
-            sm:px-5
-
-            py-2
-
-            rounded-xl
-
-            text-sm
-            sm:text-base
-
-            font-medium
-
-            shadow-sm
-
-            transition-all
-            duration-200
-
-            hover:shadow-md
-
-            active:scale-95
-          "
-        >
-          <LogOut size={18} strokeWidth={2} />
-
-          <span className="hidden sm:block">Logout</span>
-        </button>
       </div>
     </nav>
   );
