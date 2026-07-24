@@ -1,5 +1,7 @@
 import Feedback from "../models/Feedback.js";
 import puppeteer from "puppeteer";
+import fs from "fs";
+import path from "path";
 
 export const generateFeedbackPDF = async (req, res) => {
   try {
@@ -20,7 +22,14 @@ export const generateFeedbackPDF = async (req, res) => {
         : feedback.expectationNo;
 
     const skillsComments =
-      feedback.skills === "Yes" ? feedback.skillsYes : feedback.skillsNo;
+      feedback.skills === "Yes"
+        ? feedback.skillsYes
+        : feedback.skillsNo;
+
+    // Change the path if your logo is inside backend/assets
+    const logoPath = path.join(process.cwd(), "assets", "dietech-logo.png");
+
+    const logoBase64 = fs.readFileSync(logoPath).toString("base64");
 
     const html = `
 
@@ -32,253 +41,230 @@ export const generateFeedbackPDF = async (req, res) => {
 
 <meta charset="UTF-8">
 
-
 <style>
 
-
-@page {
-
- size:A4;
-
- margin:15mm;
-
+@page{
+    size:A4;
+    margin:10mm;
 }
 
-
-
-body {
-
- font-family:Arial,sans-serif;
-
- color:#222;
-
- font-size:13px;
-
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    color:#000;
+    font-size:12px;
 }
 
-
-
-.header {
-
- text-align:center;
-
- border-bottom:2px solid black;
-
- padding-bottom:15px;
-
+*{
+    box-sizing:border-box;
 }
 
-
-
-.company {
-
- font-size:18px;
-
- font-weight:bold;
-
+table{
+    width:100%;
+    border-collapse:collapse;
 }
 
-
-
-.title {
-
- font-size:20px;
-
- font-weight:bold;
-
- margin-top:5px;
-
+td{
+    border:1px solid #000;
+    padding:5px;
+    vertical-align:middle;
 }
 
-
-
-.section {
-
- margin-top:10px;
-
+.header{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:12px;
 }
 
-
-
-.section-title {
-
- background:#000;
-
- color:white;
-
- padding:5px 8px;
-
- font-weight:bold;
-
- font-size:12px;
-
+.logo-section{
+    width:18%;
 }
 
-
-
-table {
-
- width:100%;
-
- border-collapse:collapse;
-
- margin-top:5px;
-
+.logo{
+    width:120px;
+    height:auto;
 }
 
-
-
-td {
-
- border:1px solid #ccc;
-
- padding:5px;
-
+.title-section{
+    width:52%;
+    text-align:center;
+    padding-top:10px;
 }
 
-
-
-.label {
-
- width:35%;
-
- font-weight:bold;
-
- background:#f5f5f5;
-
+.company{
+    font-size:18px;
+    font-weight:bold;
 }
 
-
-
-.comment-box {
-
- border:1px solid #ccc;
-
- padding:6px;
-
- margin-top:5px;
-
- min-height:25px;
-
+.form-title{
+    margin-top:10px;
+    font-size:17px;
+    font-weight:bold;
+    text-decoration:underline;
 }
 
-
-
-.signature {
-
- margin-top:25px;
-
- display:flex;
-
- justify-content:space-between;
-
+.doc-section{
+    width:30%;
 }
 
-
-
-.signature-box {
-
- width:40%;
-
- text-align:center;
-
+.doc-table{
+    width:100%;
+    font-size:11px;
 }
 
-
-
-.signature-name {
-
- font-family:cursive;
-
- font-size:18px;
-
- font-style:italic;
-
+.doc-table td{
+    border:1px solid #000;
+    padding:4px;
 }
 
-
-
-.line {
-
- margin-top:20px;
-
- border-bottom:1px solid black;
-
+.details{
+    margin-top:8px;
 }
 
+.details td{
+    height:32px;
+}
 
+.label{
+    font-weight:bold;
+    width:18%;
+}
+
+.value{
+    width:32%;
+}
+
+.section-number{
+    width:40px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.rating-header{
+    text-align:center;
+    font-weight:bold;
+    background:#f3f3f3;
+}
+
+.rating-row td{
+    height:34px;
+}
+
+.large-box{
+    height:90px;
+    vertical-align:top;
+    padding-top:8px;
+}
+
+.signature{
+    margin-top:25px;
+    text-align:center;
+}
+
+.signature-name{
+    font-family:cursive;
+    font-size:18px;
+    font-style:italic;
+}
+
+.signature-line{
+    width:220px;
+    border-bottom:1px solid #000;
+    margin:10px auto 8px;
+}
+
+.footer-label{
+    font-weight:bold;
+}
 
 </style>
 
-
 </head>
-
-
 
 <body>
 
-
+<!-- ================= HEADER ================= -->
 
 <div class="header">
 
+    <div class="logo-section">
 
-<div class="company">
+        <img
+            class="logo"
+            src="data:image/png;base64,${logoBase64}"
+        />
 
-Dietech India Pvt. Ltd.
+    </div>
+
+    <div class="title-section">
+
+        <div class="company">
+            DIETECH INDIA P LTD
+        </div>
+
+        <div class="form-title">
+            TRAINING - FEEDBACK FORM
+        </div>
+
+    </div>
+
+    <div class="doc-section">
+
+        <table class="doc-table">
+
+            <tr>
+                <td><b>DOC No</b></td>
+                <td>DT/HR/TFB/01</td>
+            </tr>
+
+            <tr>
+                <td><b>REV No</b></td>
+                <td>00</td>
+            </tr>
+
+            <tr>
+                <td><b>DT</b></td>
+                <td>11.03.2015</td>
+            </tr>
+
+            <tr>
+                <td><b>DCR No</b></td>
+                <td>954</td>
+            </tr>
+
+        </table>
+
+    </div>
 
 </div>
 
+<!-- ================= PARTICIPANT DETAILS ================= -->
 
-<div class="title">
-
-Training Feedback Form
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="section">
-
-<div class="section-title">
-
-Participant Details
-
-</div>
-
-
-<table>
-
+<table class="details">
 
 <tr>
+
 <td class="label">
-Participant Name
+Participant's Name
 </td>
 
-<td>
+<td class="value">
 ${feedback.participantName}
 </td>
-</tr>
 
-
-
-<tr>
 <td class="label">
-Employee No
+Emp. No.
 </td>
 
-<td>
+<td class="value">
 ${feedback.employeeNo}
 </td>
+
 </tr>
 
-
-
 <tr>
+
 <td class="label">
 Department
 </td>
@@ -286,295 +272,205 @@ Department
 <td>
 ${feedback.department}
 </td>
-</tr>
 
-
-
-<tr>
 <td class="label">
-Course
-</td>
-
-<td>
-${feedback.course}
-</td>
-</tr>
-
-
-
-<tr>
-<td class="label">
-Training Date
+Date
 </td>
 
 <td>
 ${formattedDate}
 </td>
+
 </tr>
 
+<tr>
 
+<td class="label">
+Course / Programme
+</td>
+
+<td colspan="3">
+${feedback.course}
+</td>
+
+</tr>
 
 </table>
 
-</div>
-
-
-
-
-
-
-<div class="section">
-
-<div class="section-title">
-
-Training Ratings
-
-</div>
-
+<!-- ================= SECTION 1 STARTS HERE ================= -->
+<!-- ================= TRAINING RATING ================= -->
 
 <table>
 
-
 <tr>
-<td class="label">
-Content
+
+<td class="section-number" rowspan="7">
+1
 </td>
 
-<td>
-${feedback.content}
+<td class="rating-header">
+Comment on the following
 </td>
+
+<td class="rating-header">
+Rating
+</td>
+
 </tr>
 
-
-
-<tr>
-<td class="label">
-Presentation
-</td>
-
-<td>
-${feedback.presentation}
-</td>
+<tr class="rating-row">
+<td>a. Content</td>
+<td>${feedback.content}</td>
 </tr>
 
-
-
-<tr>
-<td class="label">
-Style
-</td>
-
-<td>
-${feedback.style}
-</td>
+<tr class="rating-row">
+<td>b. Presentation</td>
+<td>${feedback.presentation}</td>
 </tr>
 
-
-
-<tr>
-<td class="label">
-Material / Visual Aid
-</td>
-
-<td>
-${feedback.material}
-</td>
+<tr class="rating-row">
+<td>c. Style</td>
+<td>${feedback.style}</td>
 </tr>
 
-
-
-<tr>
-<td class="label">
-Venue / Environment
-</td>
-
-<td>
-${feedback.venue}
-</td>
+<tr class="rating-row">
+<td>d. Material / Handouts / Visual Aid</td>
+<td>${feedback.material}</td>
 </tr>
 
-
-
-<tr>
-<td class="label">
-Others
-</td>
-
-<td>
-${feedback.others}
-</td>
+<tr class="rating-row">
+<td>e. Venue / Environment</td>
+<td>${feedback.venue}</td>
 </tr>
 
+<tr class="rating-row">
+<td>f. Others</td>
+<td>${feedback.others}</td>
+</tr>
 
 </table>
 
+<br>
 
-</div>
-
-
-
-
-
-
-
-
-<div class="section">
-
-
-<div class="section-title">
-
-Expectations
-
-</div>
-
+<!-- ================= EXPECTATION ================= -->
 
 <table>
 
-
 <tr>
 
-<td class="label">
-
-Were expectations met?
-
+<td class="section-number" rowspan="3">
+2
 </td>
 
-
 <td>
+
+<b>Were your expectations met?</b>
+
+&nbsp;&nbsp;
 
 ${feedback.expectation}
 
 </td>
 
-
 </tr>
-
 
 <tr>
 
-<td class="label">
+<td class="large-box">
 
-Comments
+<b>a. If "Yes", please list major areas of your learning:</b>
+
+<br><br>
+
+${feedback.expectation === "Yes"
+? (feedback.expectationYes || "")
+: ""}
 
 </td>
-
-
-<td>
-
-${expectationComments || "No comments"}
-
-</td>
-
 
 </tr>
 
+<tr>
+
+<td class="large-box">
+
+<b>b. If "No", please give reasons:</b>
+
+<br><br>
+
+${feedback.expectation === "No"
+? (feedback.expectationNo || "")
+: ""}
+
+</td>
+
+</tr>
 
 </table>
 
+<br>
 
-</div>
-
-
-
-
-
-
-
-
-<div class="section">
-
-
-<div class="section-title">
-
-Skill Application
-
-</div>
-
+<!-- ================= SKILL APPLICATION ================= -->
 
 <table>
 
-
 <tr>
 
-<td class="label">
-
-Will apply learned skills?
-
+<td class="section-number">
+3
 </td>
 
+<td class="large-box">
 
-<td>
+<b>
+
+Will you be able to use the skills learnt during the programme?
+
+</b>
+
+&nbsp;&nbsp;
 
 ${feedback.skills}
 
-</td>
+<br><br>
 
+${skillsComments || ""}
+
+</td>
 
 </tr>
-
-
-<tr>
-
-<td class="label">
-
-Comments
-
-</td>
-
-
-<td>
-
-${skillsComments || "No comments"}
-
-</td>
-
-
-</tr>
-
 
 </table>
 
+<br>
 
-</div>
+<!-- ================= SUGGESTIONS ================= -->
 
+<table>
 
+<tr>
 
+<td class="section-number">
+4
+</td>
 
+<td class="large-box">
 
+<b>Suggestions :</b>
 
+<br><br>
 
+${feedback.suggestions || ""}
 
-<div class="section">
+</td>
 
+</tr>
 
-<div class="section-title">
+</table>
 
-Suggestions
-
-</div>
-
-
-<div class="comment-box">
-
-${feedback.suggestions || "No suggestions provided"}
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
+<!-- ================= SIGNATURE ================= -->
 
 <div class="signature">
-
-
-<div class="signature-box">
-
 
 <div class="signature-name">
 
@@ -582,92 +478,56 @@ ${feedback.participantName}
 
 </div>
 
+<div class="signature-line"></div>
 
-<div class="line"></div>
+<div class="footer-label">
 
-
-<p>
-
-Participant Signature
-
-</p>
-
+Employee Signature
 
 </div>
 
-
-
-
-
-<div class="signature-box">
-
-
-<div class="signature-name">
-
-Trainer
-
 </div>
-
-
-<div class="line"></div>
-
-
-<p>
-
-Trainer Signature
-
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
 
 </body>
 
-
 </html>
-
 
 `;
 
-    const browser = await puppeteer.launch({
-      headless: true,
-    });
+const browser = await puppeteer.launch({
+  headless: true,
+});
 
-    const page = await browser.newPage();
+const page = await browser.newPage();
 
-    await page.setContent(html, {
-      waitUntil: "networkidle0",
-    });
+await page.setContent(html, {
+  waitUntil: "networkidle0",
+});
 
-    const pdfBuffer = await page.pdf({
-      format: "A4",
+const pdfBuffer = await page.pdf({
+  format: "A4",
+  printBackground: true,
+  preferCSSPageSize: true,
+});
 
-      printBackground: true,
-    });
+await browser.close();
 
-    await browser.close();
+res.set({
+  "Content-Type": "application/pdf",
+  "Content-Disposition": `attachment; filename=feedback-${feedback.employeeNo}.pdf`,
+});
 
-    res.set({
-      "Content-Type": "application/pdf",
+return res.send(pdfBuffer);
 
-      "Content-Disposition": `attachment; filename=feedback-${feedback.employeeNo}.pdf`,
-    });
+} catch (error) {
 
-    res.send(pdfBuffer);
-  } catch (error) {
-    console.error("PDF Generation Error:", error);
+console.error("PDF Generation Error:", error);
 
-    res.status(500).json({
-      success: false,
+return res.status(500).json({
+success: false,
+message: "PDF generation failed.",
+});
 
-      message: "PDF generation failed.",
-    });
-  }
+}
+
 };
