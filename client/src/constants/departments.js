@@ -1,5 +1,5 @@
 const DEPARTMENTS = [
-  "Assembly",
+  "Assembly", 
   "CNC",
   "Design",
   "Finance",

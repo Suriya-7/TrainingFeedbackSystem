@@ -1,62 +1,145 @@
 import { X } from "lucide-react";
 
+
 /* ===========================
    Reusable Info Box Component
 =========================== */
 
 function InfoBox({ label, value }) {
+
   return (
+
     <div
       className="
-        bg-gray-50
+        bg-white
         border
         border-gray-200
         rounded-xl
         p-4
+        shadow-sm
+        hover:shadow-md
+        transition
       "
     >
-      <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+
+      <p
+        className="
+          text-[11px]
+          uppercase
+          tracking-wider
+          font-semibold
+          text-gray-500
+          mb-2
+        "
+      >
         {label}
       </p>
 
-      <p className="text-sm font-semibold text-gray-900 break-words">
+
+      <p
+        className="
+          text-sm
+          font-semibold
+          text-gray-900
+          break-words
+        "
+      >
         {value || "-"}
       </p>
+
+
     </div>
+
   );
+
 }
+
+
+
+/* ===========================
+   Section Header Component
+=========================== */
+
+function SectionTitle({ children }) {
+
+  return (
+
+    <div
+      className="
+        flex
+        items-center
+        gap-3
+        mb-4
+      "
+    >
+
+      <div
+        className="
+          w-1
+          h-6
+          rounded-full
+          bg-gray-900
+        "
+      />
+
+      <h3
+        className="
+          text-base
+          sm:text-lg
+          font-bold
+          text-gray-900
+        "
+      >
+        {children}
+      </h3>
+
+    </div>
+
+  );
+
+}
+
+
 
 /* ===========================
    Feedback Modal
 =========================== */
 
 function FeedbackModal({ feedback, onClose }) {
+
   if (!feedback) return null;
 
+
   return (
+
     <div
       className="
         fixed
         inset-0
-        bg-black/50
+        z-50
         flex
         items-center
         justify-center
-        z-50
-        px-4
+        bg-black/50
+        backdrop-blur-sm
+        px-3
+        sm:px-5
       "
     >
+
       <div
         className="
           bg-white
           w-full
-          max-w-4xl
-          rounded-2xl
+          max-w-5xl
+          rounded-3xl
           shadow-2xl
-          max-h-[90vh]
           overflow-hidden
+          max-h-[92vh]
         "
       >
+
+
         {/* Header */}
 
         <div
@@ -64,137 +147,222 @@ function FeedbackModal({ feedback, onClose }) {
             flex
             items-center
             justify-between
-            px-6
-            py-4
+            px-5
+            sm:px-7
+            py-5
             border-b
             border-gray-200
+            bg-gray-50
           "
         >
+
           <div>
-            <h2 className="text-xl font-bold text-gray-900">
+
+            <h2
+              className="
+                text-xl
+                sm:text-2xl
+                font-bold
+                text-gray-900
+              "
+            >
               Feedback Details
             </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+
+            <p
+              className="
+                text-sm
+                text-gray-500
+                mt-1
+              "
+            >
               Complete training feedback information
             </p>
+
+
           </div>
+
+
 
           <button
             onClick={onClose}
             className="
-              p-2
+              w-10
+              h-10
               rounded-xl
-              hover:bg-gray-100
+              flex
+              items-center
+              justify-center
+              text-gray-600
+              hover:bg-gray-200
+              transition
             "
           >
-            <X size={22} />
+
+            <X size={22}/>
+
           </button>
+
+
         </div>
+
+
+
 
         {/* Body */}
 
         <div
           className="
-            p-6
+            p-5
+            sm:p-7
             overflow-y-auto
-            max-h-[calc(90vh-80px)]
-            space-y-6
+            max-h-[calc(92vh-90px)]
+            space-y-8
           "
         >
+
+
           {/* Participant Details */}
 
           <section>
-            <h3
-              className="
-                text-lg
-                font-bold
-                text-gray-900
-                mb-4
-              "
-            >
+
+            <SectionTitle>
               Participant Details
-            </h3>
+            </SectionTitle>
+
 
             <div
               className="
                 grid
+                grid-cols-1
                 md:grid-cols-2
                 gap-4
               "
             >
+
               <InfoBox
                 label="Participant Name"
                 value={feedback.participantName}
               />
 
-              <InfoBox label="Employee Number" value={feedback.employeeNo} />
 
-              <InfoBox label="Department" value={feedback.department} />
+              <InfoBox
+                label="Employee Number"
+                value={feedback.employeeNo}
+              />
 
-              <InfoBox label="Training Date" value={feedback.date} />
 
-              <InfoBox label="Course" value={feedback.course} />
+              <InfoBox
+                label="Department"
+                value={feedback.department}
+              />
+
+
+              <InfoBox
+                label="Training Date"
+                value={feedback.date}
+              />
+
+
+              <InfoBox
+                label="Course"
+                value={feedback.course}
+              />
+
             </div>
+
           </section>
 
-          {/* Rating Details */}
+
+
+
+
+          {/* Ratings */}
 
           <section>
-            <h3
-              className="
-                text-lg
-                font-bold
-                text-gray-900
-                mb-4
-              "
-            >
+
+            <SectionTitle>
               Training Rating
-            </h3>
+            </SectionTitle>
+
 
             <div
               className="
                 grid
+                grid-cols-1
                 md:grid-cols-2
                 gap-4
               "
             >
-              <InfoBox label="Content" value={feedback.content} />
 
-              <InfoBox label="Presentation" value={feedback.presentation} />
+              <InfoBox
+                label="Content"
+                value={feedback.content}
+              />
 
-              <InfoBox label="Style" value={feedback.style} />
+
+              <InfoBox
+                label="Presentation"
+                value={feedback.presentation}
+              />
+
+
+              <InfoBox
+                label="Style"
+                value={feedback.style}
+              />
+
 
               <InfoBox
                 label="Material / Visual Aid"
                 value={feedback.material}
               />
 
-              <InfoBox label="Venue / Environment" value={feedback.venue} />
 
-              <InfoBox label="Others" value={feedback.others} />
+              <InfoBox
+                label="Venue / Environment"
+                value={feedback.venue}
+              />
+
+
+              <InfoBox
+                label="Others"
+                value={feedback.others}
+              />
+
             </div>
+
+
           </section>
+
+
+
+
 
           {/* Expectations */}
 
           <section>
-            <h3
+
+            <SectionTitle>
+              Expectations
+            </SectionTitle>
+
+
+            <div
               className="
-                text-lg
-                font-bold
-                text-gray-900
-                mb-4
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                gap-4
               "
             >
-              Expectations
-            </h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
               <InfoBox
                 label="Expectation Status"
                 value={feedback.expectation}
               />
+
 
               <InfoBox
                 label="Comments"
@@ -204,42 +372,43 @@ function FeedbackModal({ feedback, onClose }) {
                     : feedback.expectationNo
                 }
               />
+
             </div>
+
           </section>
+
+
+
+
 
           {/* Skills */}
 
           <section>
-            <h3
-              className="
-                text-lg
-                font-bold
-                text-gray-900
-                mb-4
-              "
-            >
+
+            <SectionTitle>
               Skills Application
-            </h3>
+            </SectionTitle>
+
 
             <InfoBox
-              label="Will apply learned skills"
+              label="How skills will be applied"
               value={feedback.skills}
             />
+
           </section>
+
+
+
+
 
           {/* Suggestions */}
 
           <section>
-            <h3
-              className="
-                text-lg
-                font-bold
-                text-gray-900
-                mb-4
-              "
-            >
+
+            <SectionTitle>
               Suggestions
-            </h3>
+            </SectionTitle>
+
 
             <div
               className="
@@ -247,19 +416,34 @@ function FeedbackModal({ feedback, onClose }) {
                 border
                 border-gray-200
                 rounded-xl
-                p-4
+                p-5
                 text-sm
                 text-gray-700
-                min-h-20
+                leading-relaxed
+                min-h-24
               "
             >
+
               {feedback.suggestions || "No suggestions provided."}
+
             </div>
+
+
           </section>
+
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
   );
+
 }
+
 
 export default FeedbackModal;
