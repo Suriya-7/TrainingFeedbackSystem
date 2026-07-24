@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, CalendarDays } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 function SearchFilterBar({
   searchTerm,
@@ -7,9 +7,6 @@ function SearchFilterBar({
   departments,
   selectedDepartment,
   onDepartmentChange,
-
-  selectedDate,
-  onDateChange,
 }) {
   return (
     <div
@@ -29,62 +26,51 @@ function SearchFilterBar({
         className="
           flex
           items-center
-          gap-2
-          mb-5
+          gap-3
+          mb-6
         "
       >
         <div
           className="
-            w-9
-            h-9
+            w-10
+            h-10
             rounded-xl
             bg-gray-900
             text-white
             flex
             items-center
             justify-center
+            shrink-0
           "
         >
           <SlidersHorizontal size={18} />
         </div>
 
         <div>
-          <h3
-            className="
-              text-base
-              font-bold
-              text-gray-900
-            "
-          >
+          <h3 className="text-base font-bold text-gray-900">
             Search & Filter
           </h3>
 
-          <p
-            className="
-              text-sm
-              text-gray-500
-            "
-          >
+          <p className="text-sm text-gray-500">
             Find feedback records quickly
           </p>
         </div>
       </div>
 
+      {/* Filters */}
+
       <div
         className="
-          grid
-          grid-cols-1
-          lg:grid-cols-4
-          gap-4
+          flex
+          flex-col
+          lg:flex-row
+          gap-5
+          items-end
         "
       >
         {/* Search */}
 
-        <div
-          className="
-            lg:col-span-2
-          "
-        >
+        <div className="flex-1 w-full">
           <label
             className="
               block
@@ -113,13 +99,9 @@ function SearchFilterBar({
 
             <input
               type="text"
-
               value={searchTerm}
-
               onChange={(e) => onSearch(e.target.value)}
-
               placeholder="Search participant, employee no or course..."
-
               className="
                 w-full
                 pl-11
@@ -130,10 +112,12 @@ function SearchFilterBar({
                 border-gray-300
                 text-sm
                 text-gray-700
+                bg-white
                 focus:outline-none
                 focus:ring-2
                 focus:ring-gray-900
-                transition
+                focus:border-gray-900
+                transition-all
               "
             />
           </div>
@@ -141,7 +125,7 @@ function SearchFilterBar({
 
         {/* Department */}
 
-        <div>
+        <div className="w-full lg:w-72">
           <label
             className="
               block
@@ -158,9 +142,7 @@ function SearchFilterBar({
 
           <select
             value={selectedDepartment}
-
             onChange={(e) => onDepartmentChange(e.target.value)}
-
             className="
               w-full
               px-4
@@ -174,7 +156,8 @@ function SearchFilterBar({
               focus:outline-none
               focus:ring-2
               focus:ring-gray-900
-              transition
+              focus:border-gray-900
+              transition-all
               cursor-pointer
             "
           >
@@ -184,62 +167,6 @@ function SearchFilterBar({
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Date Filter */}
-
-        <div>
-          <label
-            className="
-              block
-              text-xs
-              font-semibold
-              uppercase
-              tracking-wide
-              text-gray-500
-              mb-2
-            "
-          >
-            Training Date
-          </label>
-
-          <div className="relative">
-            <CalendarDays
-              size={18}
-
-              className="
-                absolute
-                left-4
-                top-1/2
-                -translate-y-1/2
-                text-gray-400
-              "
-            />
-
-            <input
-              type="date"
-
-              value={selectedDate}
-
-              onChange={(e) => onDateChange(e.target.value)}
-
-              className="
-                w-full
-                pl-11
-                pr-4
-                py-3
-                rounded-xl
-                border
-                border-gray-300
-                text-sm
-                text-gray-700
-                focus:outline-none
-                focus:ring-2
-                focus:ring-gray-900
-                transition
-              "
-            />
-          </div>
         </div>
       </div>
     </div>
