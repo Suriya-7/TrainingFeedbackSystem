@@ -1,10 +1,11 @@
+import DEPARTMENTS from "../../constants/departments";
+
 function BasicDetailsSection({
   formData,
   handleChange,
   errors,
   setErrors,
 }) {
-
   const handleInputChange = (e) => {
     handleChange(e);
 
@@ -21,18 +22,22 @@ function BasicDetailsSection({
   const inputClass = (field) =>
     `
     w-full
+    h-11
     px-3
     py-2
     text-sm
+    text-gray-700
+    bg-white
     rounded-lg
     border
+    transition-all
+    duration-200
     focus:outline-none
     focus:ring-2
-    transition
     ${
       errors?.[field]
         ? "border-red-500 focus:ring-red-300"
-        : "border-gray-300 focus:ring-gray-400"
+        : "border-gray-300 focus:border-gray-500 focus:ring-gray-300"
     }
     `;
 
@@ -52,8 +57,7 @@ function BasicDetailsSection({
     {
       label: "Department",
       name: "department",
-      type: "text",
-      placeholder: "Department",
+      type: "select",
     },
     {
       label: "Date",
@@ -64,14 +68,13 @@ function BasicDetailsSection({
       label: "Course / Programme",
       name: "course",
       type: "text",
-      placeholder: "Enter course/programme",
+      placeholder: "Enter Course / Programme",
       fullWidth: true,
     },
   ];
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-5 mt-3">
-
       <h3 className="text-base font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">
         Employee Details
       </h3>
@@ -86,22 +89,61 @@ function BasicDetailsSection({
               {field.label}
             </label>
 
-            <input
-              type={field.type}
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleInputChange}
-              placeholder={field.placeholder}
-              className={inputClass(field.name)}
-            />
+            {field.type === "select" ? (
+              <div className="relative">
+                <select
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleInputChange}
+                  className={`${inputClass(field.name)} appearance-none pr-10 cursor-pointer`}
+                >
+                  <option value="" disabled>
+                    Select Department
+                  </option>
+
+                  {DEPARTMENTS.map((department) => (
+                    <option key={department} value={department}>
+                      {department}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Custom Dropdown Arrow */}
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            ) : (
+              <input
+                type={field.type}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleInputChange}
+                placeholder={field.placeholder}
+                className={inputClass(field.name)}
+              />
+            )}
 
             {errors?.[field.name] && (
-              <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors[field.name]}
+              </p>
             )}
           </div>
         ))}
       </div>
-
     </div>
   );
 }
