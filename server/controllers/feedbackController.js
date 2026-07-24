@@ -1,16 +1,35 @@
 import Feedback from "../models/Feedback.js";
+import validateFeedback from "../validators/feedbackValidator.js";
 
 // Create Feedback
 export const createFeedback = async (req, res) => {
   try {
-    const feedback = await Feedback.create(req.body);
+    // ==========================
+    // Backend Validation
+    // ==========================
+    const validation = validateFeedback(req.body);
+
+    if (!validation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: validation.message,
+      });
+    }
+
+    // ==========================
+    // Save Sanitized Data
+    // ==========================
+    const feedback = await Feedback.create(validation.data);
 
     res.status(201).json({
       success: true,
       message: "Feedback submitted successfully.",
       data: feedback,
     });
+
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -28,7 +47,10 @@ export const getAllFeedback = async (req, res) => {
       count: feedbacks.length,
       data: feedbacks,
     });
+
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -52,7 +74,10 @@ export const getFeedbackById = async (req, res) => {
       success: true,
       data: feedback,
     });
+
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -78,7 +103,10 @@ export const deleteFeedback = async (req, res) => {
       success: true,
       message: "Feedback deleted successfully.",
     });
+
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
