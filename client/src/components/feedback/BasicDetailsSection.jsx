@@ -49,7 +49,7 @@ function BasicDetailsSection({
       placeholder: "Enter Your Name",
     },
     {
-      label: "Emp. No",
+      label: "Emp. No (Enter 0 if not provided)",
       name: "employeeNo",
       type: "text",
       placeholder: "Employee ID",

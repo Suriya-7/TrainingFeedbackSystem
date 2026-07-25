@@ -21,11 +21,6 @@ export const generateFeedbackPDF = async (req, res) => {
         ? feedback.expectationYes
         : feedback.expectationNo;
 
-    const skillsComments =
-      feedback.skills === "Yes"
-        ? feedback.skillsYes
-        : feedback.skillsNo;
-
     // Change the path if your logo is inside backend/assets
     const logoPath = path.join(process.cwd(), "assets", "dietech-logo.png");
 
@@ -423,18 +418,12 @@ ${feedback.expectation === "No"
 <td class="large-box">
 
 <b>
-
 Will you be able to use the skills learnt during the programme?
-
 </b>
-
-&nbsp;&nbsp;
-
-${feedback.skills}
 
 <br><br>
 
-${skillsComments || ""}
+${feedback.skills || ""}
 
 </td>
 

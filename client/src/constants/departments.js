@@ -16,6 +16,7 @@ const DEPARTMENTS = [
   "Design RPD",
   "DTI Gundrilling",
   "EDM",
+  "ERP",
   "Electrode",
   "Flow",
   "Housing",
