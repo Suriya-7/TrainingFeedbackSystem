@@ -88,11 +88,46 @@ function AdminDashboard() {
 
   // Download Logic
 
-  const handleDownload = (feedback) => {
-    console.log("Download PDF:", feedback);
+const handleDownload = async (id) => {
+  try {
+    const response = await adminApi.downloadPDF(id);
 
-    toast.info("PDF download feature coming next.");
-  };
+    // Default filename
+    let fileName = "Feedback.pdf";
+
+    // Read filename from the backend header
+    const disposition = response.headers["content-disposition"];
+
+    if (disposition) {
+      const match = disposition.match(/filename="?([^"]+)"?/);
+
+      if (match && match[1]) {
+        fileName = match[1];
+      }
+    }
+
+    // Create downloadable URL
+    const url = window.URL.createObjectURL(response.data);
+
+    // Download the file
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error(error);
+
+    toast.error(
+      error.response?.data?.message || "Failed to download PDF."
+    );
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100">

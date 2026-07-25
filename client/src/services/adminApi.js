@@ -34,6 +34,19 @@ const adminApi = {
     return response.data;
   },
 
+  // Download PDF
+downloadPDF: async (id) => {
+
+  const response = await api.get(
+    `/admin/feedbacks/${id}/pdf`,
+    {
+      responseType: "blob",
+    }
+  );
+
+  return response;
+},
+
 };
 
 export default adminApi;

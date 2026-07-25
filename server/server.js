@@ -14,7 +14,12 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    exposedHeaders: ["Content-Disposition"],
+  })
+);
 app.use(express.json());
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/admin", adminRoutes);

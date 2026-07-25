@@ -156,7 +156,7 @@ function FeedbackRow({
           {/* Download PDF */}
 
           <button
-            onClick={() => onDownload(feedback)}
+            onClick={() => onDownload(feedback._id)}
             className="
               group
               w-9

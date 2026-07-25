@@ -512,9 +512,20 @@ const pdfBuffer = await page.pdf({
 
 await browser.close();
 
+// Create a safe filename
+const safeName = feedback.participantName
+  .trim()
+  .replace(/\s+/g, "_")
+  .replace(/[^\w-]/g, "");
+
+const safeDepartment = feedback.department
+  .trim()
+  .replace(/\s+/g, "_")
+  .replace(/[^\w-]/g, "");
+
 res.set({
   "Content-Type": "application/pdf",
-  "Content-Disposition": `attachment; filename=feedback-${feedback.employeeNo}.pdf`,
+  "Content-Disposition": `attachment; filename="Feedback-${safeName}-${safeDepartment}.pdf"`,
 });
 
 return res.send(pdfBuffer);
