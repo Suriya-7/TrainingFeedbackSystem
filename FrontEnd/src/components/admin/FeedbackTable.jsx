@@ -3,16 +3,13 @@ import FeedbackRow from "./FeedbackRow";
 function FeedbackTable({
   feedbacks = [],
   loading = false,
+  downloadingId = null,
   onView = () => {},
   onDelete = () => {},
   onDownload = () => {},
 }) {
-
-
   if (loading) {
-
     return (
-
       <div
         className="
           bg-white
@@ -24,7 +21,6 @@ function FeedbackTable({
           text-center
         "
       >
-
         <div
           className="
             flex
@@ -33,7 +29,6 @@ function FeedbackTable({
             gap-3
           "
         >
-
           <div
             className="
               w-10
@@ -55,23 +50,13 @@ function FeedbackTable({
           >
             Loading feedback records...
           </p>
-
         </div>
-
-
       </div>
-
     );
-
   }
 
-
-
-
   if (feedbacks.length === 0) {
-
     return (
-
       <div
         className="
           bg-white
@@ -83,7 +68,6 @@ function FeedbackTable({
           text-center
         "
       >
-
         <div
           className="
             flex
@@ -91,7 +75,6 @@ function FeedbackTable({
             items-center
           "
         >
-
           <div
             className="
               w-14
@@ -108,7 +91,6 @@ function FeedbackTable({
             📄
           </div>
 
-
           <h2
             className="
               text-xl
@@ -119,7 +101,6 @@ function FeedbackTable({
             No Feedback Found
           </h2>
 
-
           <p
             className="
               mt-2
@@ -129,22 +110,12 @@ function FeedbackTable({
           >
             Submitted feedback records will appear here.
           </p>
-
-
         </div>
-
-
       </div>
-
     );
-
   }
 
-
-
-
   return (
-
     <div
       className="
         bg-white
@@ -155,8 +126,6 @@ function FeedbackTable({
         overflow-hidden
       "
     >
-
-
       {/* Table Header */}
 
       <div
@@ -171,9 +140,7 @@ function FeedbackTable({
           bg-gray-50
         "
       >
-
         <div>
-
           <h2
             className="
               text-base
@@ -184,7 +151,6 @@ function FeedbackTable({
             Feedback Records
           </h2>
 
-
           <p
             className="
               text-sm
@@ -194,10 +160,7 @@ function FeedbackTable({
           >
             List of submitted training feedback
           </p>
-
-
         </div>
-
 
         <div
           className="
@@ -206,17 +169,9 @@ function FeedbackTable({
             text-gray-600
           "
         >
-
           {feedbacks.length} Records
-
         </div>
-
-
       </div>
-
-
-
-
 
       {/* Table */}
 
@@ -225,7 +180,6 @@ function FeedbackTable({
           overflow-x-auto
         "
       >
-
         <table
           className="
             min-w-full
@@ -233,17 +187,12 @@ function FeedbackTable({
             divide-gray-200
           "
         >
-
-
           <thead
             className="
               bg-gray-100
             "
           >
-
             <tr>
-
-
               <th
                 className="
                   px-6
@@ -258,8 +207,6 @@ function FeedbackTable({
               >
                 Date
               </th>
-
-
 
               <th
                 className="
@@ -276,8 +223,6 @@ function FeedbackTable({
                 Participant
               </th>
 
-
-
               <th
                 className="
                   px-6
@@ -292,8 +237,6 @@ function FeedbackTable({
               >
                 Employee No
               </th>
-
-
 
               <th
                 className="
@@ -310,8 +253,6 @@ function FeedbackTable({
                 Department
               </th>
 
-
-
               <th
                 className="
                   px-6
@@ -327,8 +268,6 @@ function FeedbackTable({
                 Course
               </th>
 
-
-
               <th
                 className="
                   px-6
@@ -343,16 +282,8 @@ function FeedbackTable({
               >
                 Actions
               </th>
-
-
             </tr>
-
-
           </thead>
-
-
-
-
 
           <tbody
             className="
@@ -361,40 +292,21 @@ function FeedbackTable({
               bg-white
             "
           >
-
             {feedbacks.map((feedback) => (
-
               <FeedbackRow
-
                 key={feedback._id}
-
                 feedback={feedback}
-
+                downloadingId={downloadingId}
                 onView={onView}
-
                 onDelete={onDelete}
-
                 onDownload={onDownload}
-
               />
-
             ))}
-
-
           </tbody>
-
-
         </table>
-
-
       </div>
-
-
     </div>
-
   );
-
 }
-
 
 export default FeedbackTable;

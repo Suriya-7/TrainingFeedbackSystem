@@ -31,27 +31,22 @@ function AdminDashboard() {
   } = useFeedbacks();
 
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
-  // Delete Logic
+  // ==========================
+  // Delete Feedback
+  // ==========================
 
   const handleDelete = async (feedback) => {
     const result = await Swal.fire({
       title: "Delete Feedback?",
-
       text: "This action cannot be undone.",
-
       icon: "warning",
-
       showCancelButton: true,
-
       confirmButtonText: "Yes, Delete",
-
       cancelButtonText: "Cancel",
-
       confirmButtonColor: "#dc2626",
-
       cancelButtonColor: "#6b7280",
-
       reverseButtons: true,
     });
 
@@ -62,13 +57,9 @@ function AdminDashboard() {
 
       await Swal.fire({
         title: "Deleted!",
-
         text: "Feedback deleted successfully.",
-
         icon: "success",
-
         timer: 1500,
-
         showConfirmButton: false,
       });
 
@@ -78,56 +69,71 @@ function AdminDashboard() {
 
       Swal.fire({
         title: "Error",
-
         text: error.response?.data?.message || "Failed to delete feedback.",
-
         icon: "error",
       });
     }
   };
 
-  // Download Logic
+  // ==========================
+  // Download PDF
+  // ==========================
 
-const handleDownload = async (id) => {
-  try {
-    const response = await adminApi.downloadPDF(id);
+  const handleDownload = async (id) => {
+    try {
+      setDownloadingId(id);
 
-    // Default filename
-    let fileName = "Feedback.pdf";
+      Swal.fire({
+        title: "Preparing PDF",
+        text: "Please wait while your PDF is being generated...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-    // Read filename from the backend header
-    const disposition = response.headers["content-disposition"];
+      const response = await adminApi.downloadPDF(id);
 
-    if (disposition) {
-      const match = disposition.match(/filename="?([^"]+)"?/);
+      Swal.close();
 
-      if (match && match[1]) {
-        fileName = match[1];
+      let fileName = "Feedback.pdf";
+
+      const disposition = response.headers["content-disposition"];
+
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+
+        if (match && match[1]) {
+          fileName = match[1];
+        }
       }
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded successfully.");
+    } catch (error) {
+      console.error(error);
+
+      Swal.close();
+
+      toast.error(
+        error.response?.data?.message || "Failed to download PDF."
+      );
+    } finally {
+      setDownloadingId(null);
     }
-
-    // Create downloadable URL
-    const url = window.URL.createObjectURL(response.data);
-
-    // Download the file
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-
-    document.body.appendChild(link);
-    link.click();
-
-    link.remove();
-    window.URL.revokeObjectURL(url);
-
-  } catch (error) {
-    console.error(error);
-
-    toast.error(
-      error.response?.data?.message || "Failed to download PDF."
-    );
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -135,9 +141,7 @@ const handleDownload = async (id) => {
 
       <AdminNavbar
         totalFeedbacks={totalFeedbacks}
-
         onRefresh={refreshFeedbacks}
-
         loading={loading}
       />
 
@@ -156,13 +160,9 @@ const handleDownload = async (id) => {
 
         <SearchFilterBar
           searchTerm={searchTerm}
-
           onSearch={setSearchTerm}
-
           departments={departments}
-
           selectedDepartment={selectedDepartment}
-
           onDepartmentChange={setSelectedDepartment}
         />
 
@@ -170,15 +170,12 @@ const handleDownload = async (id) => {
 
         <FeedbackTable
           feedbacks={feedbacks}
-
           loading={loading}
-
+          downloadingId={downloadingId}
           onView={(feedback) => {
             setSelectedFeedback(feedback);
           }}
-
           onDelete={handleDelete}
-
           onDownload={handleDownload}
         />
 
@@ -188,9 +185,7 @@ const handleDownload = async (id) => {
           <div className="mt-6">
             <Pagination
               currentPage={currentPage}
-
               totalPages={totalPages}
-
               onPageChange={goToPage}
             />
           </div>
@@ -202,7 +197,6 @@ const handleDownload = async (id) => {
       {selectedFeedback && (
         <FeedbackModal
           feedback={selectedFeedback}
-
           onClose={() => {
             setSelectedFeedback(null);
           }}

@@ -1,14 +1,18 @@
-import { Eye, Trash2, Download } from "lucide-react";
+import {
+  Eye,
+  Trash2,
+  Download,
+  Loader2,
+} from "lucide-react";
 
 function FeedbackRow({
   feedback,
   onView,
   onDelete,
   onDownload,
+  downloading,
 }) {
-
   return (
-
     <tr
       className="
         border-b
@@ -17,10 +21,7 @@ function FeedbackRow({
         transition
       "
     >
-
-
       {/* Submitted Date */}
-
       <td
         className="
           px-6
@@ -33,10 +34,7 @@ function FeedbackRow({
         {new Date(feedback.createdAt).toLocaleDateString()}
       </td>
 
-
-
       {/* Name */}
-
       <td
         className="
           px-6
@@ -50,11 +48,7 @@ function FeedbackRow({
         {feedback.participantName}
       </td>
 
-
-
-
       {/* Employee Number */}
-
       <td
         className="
           px-6
@@ -66,11 +60,7 @@ function FeedbackRow({
         {feedback.employeeNo}
       </td>
 
-
-
-
       {/* Department */}
-
       <td
         className="
           px-6
@@ -82,11 +72,7 @@ function FeedbackRow({
         {feedback.department}
       </td>
 
-
-
-
       {/* Course */}
-
       <td
         className="
           px-6
@@ -100,18 +86,13 @@ function FeedbackRow({
         {feedback.course}
       </td>
 
-
-
-
       {/* Actions */}
-
       <td
         className="
           px-6
           py-4
         "
       >
-
         <div
           className="
             flex
@@ -120,11 +101,7 @@ function FeedbackRow({
             gap-2
           "
         >
-
-
-
           {/* View */}
-
           <button
             onClick={() => onView(feedback)}
             className="
@@ -144,19 +121,13 @@ function FeedbackRow({
             "
             title="View Feedback"
           >
-
-            <Eye size={17}/>
-
+            <Eye size={17} />
           </button>
 
-
-
-
-
           {/* Download PDF */}
-
           <button
             onClick={() => onDownload(feedback._id)}
+            disabled={downloading}
             className="
               group
               w-9
@@ -171,20 +142,24 @@ function FeedbackRow({
               hover:text-white
               transition-all
               duration-200
+              disabled:opacity-60
+              disabled:cursor-not-allowed
+              disabled:hover:bg-green-50
+              disabled:hover:text-green-600
             "
-            title="Download PDF"
+            title={downloading ? "Downloading PDF..." : "Download PDF"}
           >
-
-            <Download size={17}/>
-
+            {downloading ? (
+              <Loader2
+                size={17}
+                className="animate-spin"
+              />
+            ) : (
+              <Download size={17} />
+            )}
           </button>
 
-
-
-
-
           {/* Delete */}
-
           <button
             onClick={() => onDelete(feedback)}
             className="
@@ -204,21 +179,11 @@ function FeedbackRow({
             "
             title="Delete Feedback"
           >
-
-            <Trash2 size={17}/>
-
+            <Trash2 size={17} />
           </button>
-
-
-
         </div>
-
-
       </td>
-
-
     </tr>
-
   );
 }
 
