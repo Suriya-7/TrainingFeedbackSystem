@@ -1,5 +1,6 @@
 import Feedback from "../models/Feedback.js";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import fs from "fs";
 import path from "path";
 
@@ -484,7 +485,10 @@ Employee Signature
 `;
 
 const browser = await puppeteer.launch({
-  headless: true,
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
 });
 
 const page = await browser.newPage();
