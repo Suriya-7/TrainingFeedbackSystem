@@ -3,6 +3,7 @@ import EmployeeFeedback from "./pages/EmployeeFeedback";
 import AdminLogin from "./pages/AdminLogin";
 import Dashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
 
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
