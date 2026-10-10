@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const protect = (req, res, next) => {
+export const protect = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // Check if Authorization header exists
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -12,14 +11,10 @@ const protect = (req, res, next) => {
       });
     }
 
-    // Extract token
     const token = authHeader.split(" ")[1];
-
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Store admin details in request
-    req.admin = decoded;
+    req.user = decoded; // { role: 'ADMIN' | 'EMPLOYEE', id, plantCode }
 
     next();
   } catch (error) {
@@ -28,6 +23,18 @@ const protect = (req, res, next) => {
       message: "Invalid or expired token.",
     });
   }
+};
+
+export const requireRole = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden — insufficient permissions.",
+      });
+    }
+    next();
+  };
 };
 
 export default protect;

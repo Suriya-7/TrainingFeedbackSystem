@@ -22,7 +22,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // A 401 from the login call itself means "wrong username/password" — let the
+    // login page show that message instead of reloading the page.
+    const isLoginCall = error.config?.url?.includes("/login");
+
+    if (error.response?.status === 401 && !isLoginCall) {
       localStorage.removeItem("adminToken");
 
       // Redirect to login

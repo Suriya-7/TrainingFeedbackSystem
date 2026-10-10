@@ -1,30 +1,17 @@
 import express from "express";
+import { protect, requireRole } from "../middleware/authMiddleware.js";
 import {
-  createFeedback,
-  getAllFeedback,
-  getFeedbackById,
-  deleteFeedback,
+  listMyPendingFeedback,
+  getFeedbackRecord,
+  submitFeedback,
 } from "../controllers/feedbackController.js";
-
-import { generateFeedbackPDF } from "../controllers/pdfController.js";
-import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ================================
-// Public Route (Employee)
-// ================================
-router.post("/", createFeedback);
+router.use(protect, requireRole("EMPLOYEE"));
 
-// ================================
-// Protected Routes (Admin)
-// ================================
-router.get("/", protect, getAllFeedback);
-
-router.get("/pdf/:id", protect, generateFeedbackPDF);
-
-router.get("/:id", protect, getFeedbackById);
-
-router.delete("/:id", protect, deleteFeedback);
+router.get("/pending", listMyPendingFeedback);
+router.get("/:id", getFeedbackRecord);
+router.post("/:id/submit", submitFeedback);
 
 export default router;
