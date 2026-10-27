@@ -37,11 +37,26 @@ export function buildConnectString() {
  * If the DB is older (e.g. 11g) you get error NJS-138 — in that case install
  * Oracle Instant Client and set ORACLE_CLIENT_LIB_DIR in .env to its folder.
  */
+
 export function initClientIfNeeded() {
-  if (clientInitialised || !process.env.ORACLE_CLIENT_LIB_DIR) return;
-  oracledb.initOracleClient({ libDir: process.env.ORACLE_CLIENT_LIB_DIR });
+  if (clientInitialised) return;
+
+  const libDir = process.env.ORACLE_CLIENT_LIB_DIR;
+
+  if (!libDir) {
+    throw new Error(
+      "ORACLE_CLIENT_LIB_DIR is missing. Check your backend .env file."
+    );
+  }
+
+  console.log("Initializing Oracle Client from:", libDir);
+
+  oracledb.initOracleClient({ libDir });
   clientInitialised = true;
+
+  console.log("Oracle Client initialized successfully.");
 }
+
 
 export const connectDB = async () => {
   try {
