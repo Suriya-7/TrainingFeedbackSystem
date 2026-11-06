@@ -26,6 +26,15 @@ async function launchBrowser() {
 export const downloadTrainingPdfs = async (req, res) => {
   const { id } = req.params;
 
+  // An admin may only download PDFs of their own plant's trainings.
+  const owned = await runQuery(
+    `SELECT training_id FROM trainings WHERE training_id = :id AND plant_code = :plantCode`,
+    { id, plantCode: req.user.plantCode }
+  );
+  if (owned.rows.length === 0) {
+    return res.status(404).json({ success: false, message: "Training not found." });
+  }
+
   const result = await runQuery(
     `SELECT * FROM training_feedback WHERE training_id = :id AND status = 'COMPLETED' ORDER BY employee_no`,
     { id }

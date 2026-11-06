@@ -81,6 +81,8 @@ function AdminCreateTraining() {
   };
 
   const assignableList = employees.filter((e) => e.employeeNo !== trainerEmployeeNo);
+  // The server already sends only this admin's plant; trainers are the ones flagged isTrainer.
+  const trainers = employees.filter((e) => e.isTrainer);
 
   if (loading) {
     return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-gray-500">Loading...</div>;
@@ -154,8 +156,10 @@ function AdminCreateTraining() {
               onChange={(e) => setTrainerEmployeeNo(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
             >
-              <option value="">Select trainer...</option>
-              {employees.map((e) => (
+              <option value="">
+                {trainers.length ? "Select trainer..." : "No trainers found for this plant"}
+              </option>
+              {trainers.map((e) => (
                 <option key={e.employeeNo} value={e.employeeNo}>
                   {e.fullName} ({e.employeeNo})
                 </option>

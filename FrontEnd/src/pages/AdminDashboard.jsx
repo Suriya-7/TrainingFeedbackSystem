@@ -4,6 +4,7 @@ import { Plus, Users, LogOut, GraduationCap } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { getTrainings } from "../services/trainingApi";
+import authService from "../services/authService";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -26,7 +27,14 @@ function AdminDashboard() {
     <div className="min-h-screen bg-gray-100 px-4 py-10">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Trainings</h1>
+          <h1 className="text-xl font-bold text-gray-900">
+            Trainings
+            {authService.getPlantName() && (
+              <span className="ml-3 align-middle text-xs font-semibold bg-gray-900 text-white px-2.5 py-1 rounded-full">
+                {authService.getPlantName()}
+              </span>
+            )}
+          </h1>
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/admin/trainings/new")}

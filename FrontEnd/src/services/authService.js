@@ -27,6 +27,18 @@ const authService = {
     return localStorage.getItem(TOKEN_KEY);
   },
 
+  // Plant this admin belongs to, e.g. "Plant 1" (read from the login token)
+  getPlantName: () => {
+    try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return "";
+      const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      return String(payload.plantCode || "").replace(/^PLANT(\d+)$/i, "Plant $1");
+    } catch {
+      return "";
+    }
+  },
+
   // Check Login Status
   isAuthenticated: () => {
     return !!localStorage.getItem(TOKEN_KEY);

@@ -1,5 +1,4 @@
-import oracledb from "oracledb";
-import { runQuery, isDuplicateError } from "../utils/db.js";
+import { runQuery, insertOne, raw, isDuplicateError } from "../utils/db.js";
 
 export const listTrainingTypes = async (req, res) => {
   const result = await runQuery(
@@ -16,15 +15,13 @@ export const createTrainingType = async (req, res) => {
   }
 
   try {
-    const result = await runQuery(
-      `INSERT INTO training_types (training_name) VALUES (:trainingName)
-       RETURNING training_type_id INTO :id`,
-      {
-        trainingName: trainingName.trim(),
-        id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-      }
-    );
-    res.status(201).json({ success: true, data: result.outBinds?.id?.[0] });
+    const id = await insertOne("training_types", "training_type_id", {
+      training_name: trainingName.trim(),
+      is_active: 1,
+      created_at: raw("SYSTIMESTAMP"),
+      updated_at: raw("SYSTIMESTAMP"),
+    });
+    res.status(201).json({ success: true, data: id });
   } catch (error) {
     if (isDuplicateError(error)) {
       return res.status(409).json({ success: false, message: "That training name already exists." });

@@ -10,6 +10,7 @@
 import "dotenv/config";
 import oracledb from "oracledb";
 import { buildConnectString, initClientIfNeeded } from "./config/oracleDb.js";
+import { insertRow, getNextId, raw } from "./utils/db.js";
 
 const OBJ = { outFormat: oracledb.OUT_FORMAT_OBJECT };
 const flags = new Set(process.argv.slice(2));
@@ -140,26 +141,56 @@ async function main() {
 
     // ---- 4. Optional write test (always rolled back) ----
     if (flags.has("--write-test")) {
-      await check("Write test (INSERT + UPDATE, rolled back)", async () => {
-        const noCommit = { autoCommit: false };
+      await check("Write test (INSERT into every table + UPDATE, rolled back)", async () => {
+        // Same code path the app uses: ID = MAX + 1, supplied by our code.
+        const exec = (sql, binds = {}) =>
+          connection.execute(sql, binds, { autoCommit: false, outFormat: oracledb.OUT_FORMAT_OBJECT });
+        let step = "";
         try {
-          const ins = await connection.execute(
-            `INSERT INTO training_types (training_name) VALUES (:n) RETURNING training_type_id INTO :id`,
-            { n: "__connection_test__", id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER } },
-            noCommit
-          );
-          console.log("✅ INSERT works. The ID was generated automatically:", ins.outBinds.id[0]);
-          await connection.execute(
+          step = "TRAINING_TYPES";
+          const typeId = await insertRow(exec, "training_types", "training_type_id", {
+            training_name: "__connection_test__", is_active: 1,
+            created_at: raw("SYSTIMESTAMP"), updated_at: raw("SYSTIMESTAMP"),
+          });
+          console.log(`✅ INSERT into TRAINING_TYPES works (ID ${typeId} supplied by our code).`);
+
+          step = "EMPLOYEE_CREDENTIALS";
+          const credId = await insertRow(exec, "employee_credentials", "credential_id", {
+            employee_no: "__TEST__", plant_code: "PLANT1", password_hash: "x",
+            created_at: raw("SYSTIMESTAMP"), updated_at: raw("SYSTIMESTAMP"),
+          });
+          console.log(`✅ INSERT into EMPLOYEE_CREDENTIALS works (ID ${credId}).`);
+
+          step = "TRAININGS";
+          const trainingId = await insertRow(exec, "trainings", "training_id", {
+            training_type_id: typeId, trainer_employee_no: "__TEST__", plant_code: "PLANT1",
+            created_at: raw("SYSTIMESTAMP"),
+          });
+          console.log(`✅ INSERT into TRAININGS works (ID ${trainingId}).`);
+
+          step = "TRAINING_FEEDBACK";
+          const recordId = await getNextId(exec, "training_feedback", "record_id");
+          await insertRow(exec, "training_feedback", "record_id", {
+            training_id: trainingId, employee_no: "__TEST__", participant_name: "Test",
+            department: "Test", course_name: "__connection_test__", status: "PENDING",
+            assigned_at: raw("SYSTIMESTAMP"),
+          }, recordId);
+          console.log(`✅ INSERT into TRAINING_FEEDBACK works (ID ${recordId}).`);
+
+          step = "UPDATE";
+          await exec(
             `UPDATE training_types SET training_name = :n WHERE training_type_id = :id`,
-            { n: "__connection_test_2__", id: ins.outBinds.id[0] },
-            noCommit
+            { n: "__connection_test_2__", id: typeId }
           );
           console.log("✅ UPDATE works.");
         } catch (error) {
           if (LOST.test(error.message)) throw error; // let the retry logic handle dropped connections
-          if (error.message.includes("ORA-01400")) console.log("→ The ID column is NOT filled in automatically. Ask the DB team to add a sequence + trigger (or tell me and I'll adapt the code).");
+          console.log(`❌ Failed at: ${step}`);
+          console.log("   Oracle said:", firstLine(error));
+          if (error.message.includes("ORA-01400")) console.log("→ A NOT NULL column has no value. The message above names the column - send it to me and I'll add it to the insert.");
           else if (error.message.includes("ORA-01031")) console.log("→ This user lacks INSERT/UPDATE permission on the table.");
           else if (error.message.includes("ORA-00942")) console.log("→ Table not found or not accessible to this user.");
+          else if (error.message.includes("ORA-02291")) console.log("→ A foreign key points at a row that doesn't exist.");
           throw error;
         } finally {
           try { await connection.rollback(); console.log("↩️  Rolled back — nothing was saved."); } catch { /* connection already gone */ }

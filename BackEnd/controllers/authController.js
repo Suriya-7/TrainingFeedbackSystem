@@ -1,7 +1,8 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import { runQuery } from "../utils/db.js";
+import { runQuery, insertOne, raw, isDuplicateError } from "../utils/db.js";
 import { fetchEmployeeByNo } from "../services/employeeApiService.js";
 
 function issueToken(payload, expiresIn) {
@@ -69,11 +70,21 @@ export const setEmployeePassword = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await runQuery(
-      `INSERT INTO employee_credentials (employee_no, plant_code, password_hash)
-       VALUES (:employeeNo, :plantCode, :passwordHash)`,
-      { employeeNo: employee.employeeNo, plantCode: employee.plantCode, passwordHash }
-    );
+    try {
+      await insertOne("employee_credentials", "credential_id", {
+        employee_no: employee.employeeNo,
+        plant_code: employee.plantCode,
+        password_hash: passwordHash,
+        created_at: raw("SYSTIMESTAMP"),
+        updated_at: raw("SYSTIMESTAMP"),
+      });
+    } catch (insertError) {
+      // Double-click / two tabs: the employee_no is already registered.
+      if (isDuplicateError(insertError)) {
+        return res.status(409).json({ success: false, message: "Password already set. Please log in instead." });
+      }
+      throw insertError;
+    }
 
     const token = issueToken(
       { id: employee.employeeNo, role: "EMPLOYEE", plantCode: employee.plantCode },
@@ -130,21 +141,61 @@ export const employeeLogin = async (req, res) => {
   }
 };
 
-// Admin login — single plant for now, credentials from .env.
-export const adminLogin = (req, res) => {
-  const { username, password } = req.body;
+// ---------------------------------------------------------------------------
+// Admin login — one admin account PER PLANT, all read from .env:
+//
+//   ADMIN_USERNAME_plant1 / ADMIN_PASSWORD_plant1   -> PLANT1
+//   ADMIN_USERNAME_plant2 / ADMIN_PASSWORD_plant2   -> PLANT2
+//   ADMIN_USERNAME_plant3 / ADMIN_PASSWORD_plant3   -> PLANT3
+//
+// The text after "ADMIN_USERNAME_" decides the plant (upper/lower case does not
+// matter). Adding "plant4" later needs only two new .env lines, no code change.
+// The matched plant goes into the login token, so every admin page (employees,
+// trainers, trainings, PDFs) automatically shows only that plant's data.
+// ---------------------------------------------------------------------------
+const toPlantCode = (suffix) => suffix.toUpperCase().replace(/[^A-Z0-9]/g, ""); // "plant1" -> "PLANT1"
 
-  if (
-    !username ||
-    !password ||
-    username !== process.env.ADMIN_USERNAME ||
-    password !== process.env.ADMIN_PASSWORD
-  ) {
+function loadAdminAccounts() {
+  const keys = Object.keys(process.env);
+  const accounts = [];
+  for (const key of keys) {
+    const match = key.match(/^ADMIN_USERNAME_(.+)$/i);
+    if (!match) continue;
+    const passwordKey = keys.find((k) => k.toUpperCase() === `ADMIN_PASSWORD_${match[1].toUpperCase()}`);
+    const username = process.env[key];
+    const password = passwordKey ? process.env[passwordKey] : "";
+    if (username && password) accounts.push({ plantCode: toPlantCode(match[1]), username, password });
+  }
+  return accounts;
+}
+
+// Compare secrets without leaking how many characters matched.
+const sameSecret = (a, b) =>
+  crypto.timingSafeEqual(
+    crypto.createHash("sha256").update(String(a)).digest(),
+    crypto.createHash("sha256").update(String(b)).digest()
+  );
+
+export const adminLogin = (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
     return res.status(401).json({ success: false, message: "Invalid admin credentials." });
   }
 
-  // Read at call time (single plant for now, e.g. "PLANT1")
-  const token = issueToken({ id: username, role: "ADMIN", plantCode: process.env.PLANT_CODE }, "12h");
+  const accounts = loadAdminAccounts();
+  if (accounts.length === 0) {
+    console.error("adminLogin: no ADMIN_USERNAME_<plant> / ADMIN_PASSWORD_<plant> pairs found in .env");
+  }
 
-  return res.json({ success: true, token });
+  // Username AND password must belong to the SAME plant's account.
+  const account = accounts.find(
+    (a) => sameSecret(username, a.username) && sameSecret(password, a.password)
+  );
+  if (!account) {
+    return res.status(401).json({ success: false, message: "Invalid admin credentials." });
+  }
+
+  const token = issueToken({ id: account.username, role: "ADMIN", plantCode: account.plantCode }, "12h");
+  return res.json({ success: true, token, plantCode: account.plantCode });
 };

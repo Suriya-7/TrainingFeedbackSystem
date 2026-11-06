@@ -1,5 +1,4 @@
-import oracledb from "oracledb";
-import { runQuery, withTransaction } from "../utils/db.js";
+import { runQuery, withTransaction, withIdRetry, insertRow, getNextId, raw } from "../utils/db.js";
 import { fetchEmployeeByNo, fetchEmployeesByPlant } from "../services/employeeApiService.js";
 
 // For the "pick employees to assign" checklist.
@@ -33,6 +32,15 @@ export const listTrainings = async (req, res) => {
 export const getTrainingDetail = async (req, res) => {
   const { id } = req.params;
 
+  // An admin may only open trainings that belong to their own plant.
+  const owned = await runQuery(
+    `SELECT training_id FROM trainings WHERE training_id = :id AND plant_code = :plantCode`,
+    { id, plantCode: req.user.plantCode }
+  );
+  if (owned.rows.length === 0) {
+    return res.status(404).json({ success: false, message: "Training not found." });
+  }
+
   const result = await runQuery(
     `SELECT record_id, employee_no, participant_name, department, status, submitted_at
      FROM training_feedback WHERE training_id = :id ORDER BY participant_name`,
@@ -56,8 +64,9 @@ export const createTraining = async (req, res) => {
 
   // Validate the trainer is a real employee before creating anything.
   const trainer = await fetchEmployeeByNo(trainerEmployeeNo);
-  if (!trainer) {
-    return res.status(404).json({ success: false, message: "Trainer not found." });
+  if (!trainer || trainer.plantCode !== plantCode) {
+    // Same message for "doesn't exist" and "other plant" - don't reveal other plants' staff.
+    return res.status(404).json({ success: false, message: "Trainer not found in your plant." });
   }
 
   const typeResult = await runQuery(
@@ -75,45 +84,48 @@ export const createTraining = async (req, res) => {
     (n) => n && n !== trainerEmployeeNo
   );
   const looked = await Promise.all(wanted.map((n) => fetchEmployeeByNo(n)));
-  const employees = looked.filter(Boolean);
-  const notFound = wanted.filter((_, i) => !looked[i]);
+  // Only employees of THIS admin's plant can be assigned.
+  const isMine = (e) => e && e.plantCode === plantCode;
+  const employees = looked.filter(isMine);
+  const notFound = wanted.filter((_, i) => !isMine(looked[i]));
 
   if (employees.length === 0) {
-    return res.status(400).json({ success: false, message: "None of the selected employees could be found." });
+    return res.status(400).json({ success: false, message: "None of the selected employees could be found in your plant." });
   }
 
   // One transaction: the training and ALL its assignments are saved together,
-  // or none of them are.
-  const trainingId = await withTransaction(async (exec) => {
-    const created = await exec(
-      `INSERT INTO trainings (training_type_id, trainer_employee_no, plant_code)
-       VALUES (:trainingTypeId, :trainerEmployeeNo, :plantCode)
-       RETURNING training_id INTO :id`,
-      {
-        trainingTypeId,
-        trainerEmployeeNo,
-        plantCode,
-        id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-      }
-    );
-    const newId = created.outBinds.id[0];
+  // or none of them are. IDs are picked in code (MAX + 1); if another request
+  // grabs the same ID first, withIdRetry() re-runs the whole thing.
+  const trainingId = await withIdRetry(() =>
+    withTransaction(async (exec) => {
+      const newId = await insertRow(exec, "trainings", "training_id", {
+        training_type_id: trainingTypeId,
+        trainer_employee_no: trainerEmployeeNo,
+        plant_code: plantCode,
+        created_at: raw("SYSTIMESTAMP"),
+      });
 
-    for (const employee of employees) {
-      await exec(
-        `INSERT INTO training_feedback
-           (training_id, employee_no, participant_name, department, course_name)
-         VALUES (:trainingId, :employeeNo, :fullName, :department, :courseName)`,
-        {
-          trainingId: newId,
-          employeeNo: employee.employeeNo,
-          fullName: employee.fullName,
-          department: employee.department,
-          courseName,
-        }
-      );
-    }
-    return newId;
-  });
+      let recordId = await getNextId(exec, "training_feedback", "record_id");
+      for (const employee of employees) {
+        await insertRow(
+          exec,
+          "training_feedback",
+          "record_id",
+          {
+            training_id: newId,
+            employee_no: employee.employeeNo,
+            participant_name: employee.fullName,
+            department: employee.department,
+            course_name: courseName,
+            status: "PENDING",
+            assigned_at: raw("SYSTIMESTAMP"),
+          },
+          recordId++
+        );
+      }
+      return newId;
+    })
+  );
 
   res.status(201).json({
     success: true,
