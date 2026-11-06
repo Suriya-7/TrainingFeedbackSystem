@@ -1,4 +1,4 @@
-import dietechLogo from "../../assets/dietech-logo.png";
+import dietechLogo from "../../assets/dietech-logo.jpg";
 
 function HeaderSection() {
   return (
