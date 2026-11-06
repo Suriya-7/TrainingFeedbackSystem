@@ -6,6 +6,8 @@ import path from "path";
 // those plants come online — no other file needs to change.
 const PLANT_DOC_INFO = {
   PLANT1: { docNo: "DT/HR/TFB/01", revNo: "00", dt: "11.03.2015", dcrNo: "954" },
+  PLANT2: { docNo: "DT/HR/TFB/02", revNo: "00", dt: "15.06.2016", dcrNo: "1023" },
+  PLANT3: { docNo: "DT/HR/TFB/03", revNo: "00", dt: "20.09.2017", dcrNo: "1105" },
 };
 
 // Uses the logo already in your repo (BackEnd/assets/dietech-logo.png),
