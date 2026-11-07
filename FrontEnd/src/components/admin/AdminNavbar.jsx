@@ -29,7 +29,6 @@ function AdminNavbar({
 
 
   return (
-
     <nav
       className="
         sticky
@@ -52,7 +51,6 @@ function AdminNavbar({
           lg:px-8
         "
       >
-
         <div
           className="
             min-h-16
@@ -65,8 +63,6 @@ function AdminNavbar({
             gap-4
           "
         >
-
-
           {/* Company Section */}
 
           <div
@@ -78,7 +74,6 @@ function AdminNavbar({
               lg:w-auto
             "
           >
-
             <div
               className="
                 w-12
@@ -94,8 +89,6 @@ function AdminNavbar({
             >
               <Building2 size={24}/>
             </div>
-
-
             <div>
 
               <h1
@@ -125,9 +118,6 @@ function AdminNavbar({
             </div>
 
           </div>
-
-
-
           {/* Action Section */}
 
           <div
@@ -142,13 +132,6 @@ function AdminNavbar({
               lg:w-auto
             "
           >
-
-
-           
-
-
-
-
             {/* Refresh Button */}
 
             <button

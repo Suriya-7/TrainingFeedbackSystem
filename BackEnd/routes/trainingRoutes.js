@@ -8,11 +8,12 @@ import {
 } from "../controllers/trainingTypeController.js";
 import {
   listAssignableEmployees,
+  listTrainerOptions,
   listTrainings,
   getTrainingDetail,
   createTraining,
 } from "../controllers/trainingController.js";
-import { downloadTrainingPdfs } from "../controllers/pdfController.js";
+import { downloadTrainingPdfs, downloadFeedbackPdf } from "../controllers/pdfController.js";
 
 const router = express.Router();
 
@@ -24,10 +25,12 @@ router.put("/types/:id", renameTrainingType);
 router.delete("/types/:id", deleteTrainingType);
 
 router.get("/employees", listAssignableEmployees);
+router.get("/trainer-options", listTrainerOptions);
 
 router.get("/", listTrainings);
 router.post("/", createTraining);
 router.get("/:id", getTrainingDetail);
 router.get("/:id/download", downloadTrainingPdfs);
+router.get("/:id/feedback/:recordId/pdf", downloadFeedbackPdf);
 
 export default router;

@@ -108,7 +108,7 @@ function DashboardHeader({
               bg-gray-50
               border
               border-gray-200
-              min-w-[180px]
+              min-w-45
             "
           >
 

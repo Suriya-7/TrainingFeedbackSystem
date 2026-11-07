@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check } from "lucide-react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Check, CheckCircle2, User, Building2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
+import EmployeeLayout from "../components/layout/EmployeeLayout";
+import Button from "../components/ui/Button";
+import { PageLoader } from "../components/ui/Skeleton";
 import { getFeedbackRecord, submitFeedback } from "../services/employeeApi";
+
+// Shared PCs: sign the employee out as soon as their feedback is submitted,
+// so the next person starts from a clean login. Set to false to go back to the dashboard instead.
+const AUTO_LOGOUT_AFTER_SUBMIT = true;
+const LOGOUT_COUNTDOWN_SECONDS = 5;
 
 const RATINGS = ["Excellent", "Very Good", "Good", "Acceptable", "Poor"];
 
@@ -17,51 +25,62 @@ const RATING_QUESTIONS = [
   { key: "othersRating", label: "Others" },
 ];
 
-function RatingRow({ label, value, onChange }) {
+const TOTAL_REQUIRED = RATING_QUESTIONS.length + 2; // six ratings + two Yes/No
+
+// A row of radio "chips". Real radio inputs, so keyboard and screen readers work.
+function Choice({ name, options, value, onChange, cols }) {
   return (
-    <div className="py-4 border-b border-gray-100 last:border-0">
-      <p className="text-sm font-medium text-gray-900 mb-3">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {RATINGS.map((option) => (
-          <button
+    <div role="radiogroup" className={`grid gap-2 ${cols}`}>
+      {options.map((option) => {
+        const selected = value === option;
+        return (
+          <label
             key={option}
-            type="button"
-            onClick={() => onChange(option)}
-            className={`px-3.5 py-2 rounded-full text-xs font-semibold border transition ${
-              value === option
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
+            className={`flex h-11 items-center justify-center rounded-xl border px-2 text-center text-[13px] font-semibold transition select-none has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand-500 ${
+              selected
+                ? "border-brand-700 bg-brand-700 text-white shadow-sm"
+                : "border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:bg-brand-50"
             }`}
           >
+            <input
+              type="radio"
+              name={name}
+              value={option}
+              checked={selected}
+              onChange={() => onChange(option)}
+              className="sr-only"
+            />
             {option}
-          </button>
-        ))}
-      </div>
+          </label>
+        );
+      })}
     </div>
   );
 }
 
-function YesNoRow({ label, value, onChange }) {
+function Question({ index, label, children }) {
   return (
-    <div className="py-4 border-b border-gray-100 last:border-0">
-      <p className="text-sm font-medium text-gray-900 mb-3">{label}</p>
-      <div className="flex gap-2">
-        {["Yes", "No"].map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => onChange(option)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition ${
-              value === option
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
+    <div className="border-b border-slate-100 py-5 last:border-0 md:grid md:grid-cols-[minmax(0,1fr)_29rem] md:items-center md:gap-8">
+      <p className="mb-3 text-sm font-semibold text-slate-900 md:mb-0">
+        {index && <span className="mr-2 text-slate-400">{index}</span>}
+        {label}
+      </p>
+      {children}
     </div>
+  );
+}
+
+function Section({ number, title, children }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <div className="mb-1 flex items-center gap-3">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">
+          {number}
+        </span>
+        <h2 className="text-base font-bold text-slate-900">{title}</h2>
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -72,6 +91,8 @@ function EmployeeFeedbackForm() {
   const [record, setRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(LOGOUT_COUNTDOWN_SECONDS);
 
   const [form, setForm] = useState({
     contentRating: "",
@@ -102,10 +123,24 @@ function EmployeeFeedbackForm() {
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
+  // After a successful submit: count down, then go to the login page.
+  useEffect(() => {
+    if (!done || !AUTO_LOGOUT_AFTER_SUBMIT) return;
+    if (secondsLeft <= 0) {
+      navigate("/");
+      return;
+    }
+    const t = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [done, secondsLeft, navigate]);
+
   const update = (key) => (value) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const isComplete =
-    RATING_QUESTIONS.every((q) => form[q.key]) && form.expectationMet && form.skillsApplication;
+  const answered =
+    RATING_QUESTIONS.filter((q) => form[q.key]).length +
+    (form.expectationMet ? 1 : 0) +
+    (form.skillsApplication ? 1 : 0);
+  const isComplete = answered === TOTAL_REQUIRED;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -120,15 +155,17 @@ function EmployeeFeedbackForm() {
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Submit",
-      confirmButtonColor: "#111827",
+      confirmButtonColor: "#2833a0",
+      cancelButtonColor: "#64748b",
+      customClass: { popup: "!rounded-3xl" },
     });
     if (!confirm.isConfirmed) return;
 
     try {
       setSubmitting(true);
       await submitFeedback(id, form);
-      toast.success("Feedback submitted — thank you!");
-      navigate("/employee/dashboard");
+      if (AUTO_LOGOUT_AFTER_SUBMIT) localStorage.removeItem("employeeToken");
+      setDone(true);
     } catch (err) {
       toast.error(err.response?.data?.message || "Could not submit. Try again.");
     } finally {
@@ -136,95 +173,145 @@ function EmployeeFeedbackForm() {
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen bg-gray-100 flex items-center justify-center text-gray-500">Loading...</div>;
+  if (loading || !record) {
+    return (
+      <EmployeeLayout>
+        <PageLoader />
+      </EmployeeLayout>
+    );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100 px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <button
-          onClick={() => navigate("/employee/dashboard")}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft size={16} /> Back
-        </button>
-
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-100">
-            <h1 className="text-lg font-bold text-gray-900">{record.COURSE_NAME}</h1>
-            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-gray-400 text-xs">Participant</p>
-                <p className="font-medium text-gray-900">{record.PARTICIPANT_NAME}</p>
-              </div>
-              <div>
-                <p className="text-gray-400 text-xs">Department</p>
-                <p className="font-medium text-gray-900">{record.DEPARTMENT}</p>
-              </div>
-            </div>
+  /* ---------------- Thank-you screen ---------------- */
+  if (done) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
+        <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-card">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+            <CheckCircle2 size={34} />
           </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Thank you!</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Your feedback for <span className="font-semibold text-slate-700">{record.COURSE_NAME}</span> has been
+            submitted.
+          </p>
 
-          <form onSubmit={handleSubmit}>
-            <div className="p-6">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
-                1. Comment on the following
+          {AUTO_LOGOUT_AFTER_SUBMIT ? (
+            <>
+              <p className="mt-5 text-xs text-slate-400">
+                You’ve been signed out for security. Returning to sign in in {Math.max(secondsLeft, 0)}s…
               </p>
-              {RATING_QUESTIONS.map((q) => (
-                <RatingRow key={q.key} label={q.label} value={form[q.key]} onChange={update(q.key)} />
-              ))}
-            </div>
-
-            <div className="px-6 pt-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
-                2. Expectations
-              </p>
-              <YesNoRow
-                label="Were your expectations met?"
-                value={form.expectationMet}
-                onChange={update("expectationMet")}
-              />
-            </div>
-
-            <div className="px-6 pt-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
-                3. Application
-              </p>
-              <YesNoRow
-                label="Will you be able to use the skills learnt during the programme?"
-                value={form.skillsApplication}
-                onChange={update("skillsApplication")}
-              />
-            </div>
-
-            <div className="px-6 pt-2 pb-6">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                4. Suggestions
-              </p>
-              <textarea
-                value={form.suggestions}
-                onChange={(e) => setForm((prev) => ({ ...prev, suggestions: e.target.value }))}
-                placeholder="Optional — anything you'd like to add"
-                rows={4}
-                className="w-full p-4 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition resize-none"
-              />
-            </div>
-
-            <div className="p-6 bg-gray-50 border-t border-gray-100">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Check size={18} />
-                {submitting ? "Submitting..." : "Submit Feedback"}
-              </button>
-            </div>
-          </form>
+              <Button className="mt-5 w-full" size="lg" onClick={() => navigate("/")}>
+                Back to sign in
+              </Button>
+            </>
+          ) : (
+            <Button className="mt-6 w-full" size="lg" onClick={() => navigate("/employee/dashboard")}>
+              Back to my trainings
+            </Button>
+          )}
         </div>
       </div>
-    </div>
+    );
+  }
+
+  const pct = (answered / TOTAL_REQUIRED) * 100;
+
+  return (
+    <EmployeeLayout width="max-w-3xl">
+      <Link
+        to="/employee/dashboard"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900"
+      >
+        <ArrowLeft size={16} /> My trainings
+      </Link>
+
+      {/* Header */}
+      <div className="rounded-2xl bg-brand-900 p-5 text-white shadow-card sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-300">Training feedback</p>
+        <h1 className="mt-1.5 text-xl font-bold leading-snug sm:text-2xl">{record.COURSE_NAME}</h1>
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-brand-100">
+          <span className="flex items-center gap-2">
+            <User size={15} className="text-brand-300" /> {record.PARTICIPANT_NAME}
+          </span>
+          <span className="flex items-center gap-2">
+            <Building2 size={15} className="text-brand-300" /> {record.DEPARTMENT}
+          </span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-5 space-y-5 pb-28">
+        <Section number="1" title="Comment on the following">
+          {RATING_QUESTIONS.map((q, i) => (
+            <Question key={q.key} index={`${String.fromCharCode(97 + i)}.`} label={q.label}>
+              <Choice
+                name={q.key}
+                options={RATINGS}
+                value={form[q.key]}
+                onChange={update(q.key)}
+                cols="grid-cols-3 sm:grid-cols-5"
+              />
+            </Question>
+          ))}
+        </Section>
+
+        <Section number="2" title="Expectations">
+          <Question label="Were your expectations met?">
+            <Choice
+              name="expectationMet"
+              options={["Yes", "No"]}
+              value={form.expectationMet}
+              onChange={update("expectationMet")}
+              cols="grid-cols-2"
+            />
+          </Question>
+        </Section>
+
+        <Section number="3" title="Application">
+          <Question label="Will you be able to use the skills learnt during the programme?">
+            <Choice
+              name="skillsApplication"
+              options={["Yes", "No"]}
+              value={form.skillsApplication}
+              onChange={update("skillsApplication")}
+              cols="grid-cols-2"
+            />
+          </Question>
+        </Section>
+
+        <Section number="4" title="Suggestions">
+          <textarea
+            value={form.suggestions}
+            onChange={(e) => setForm((prev) => ({ ...prev, suggestions: e.target.value }))}
+            placeholder="Optional — anything you'd like to add"
+            rows={4}
+            maxLength={2000}
+            className="mt-3 w-full resize-none rounded-xl border border-slate-300 p-4 text-base text-slate-900 placeholder:text-slate-400 transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100 md:text-sm"
+          />
+        </Section>
+
+        {/* Sticky submit bar */}
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-600">
+                  {isComplete ? "All answered — ready to submit" : `${answered} of ${TOTAL_REQUIRED} answered`}
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={`h-full rounded-full transition-all duration-300 ${isComplete ? "bg-emerald-500" : "bg-brand-600"}`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+            <Button type="submit" size="lg" icon={Check} loading={submitting} disabled={!isComplete} className="shrink-0">
+              {submitting ? "Submitting…" : "Submit"}
+            </Button>
+          </div>
+        </div>
+      </form>
+    </EmployeeLayout>
   );
 }
 

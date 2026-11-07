@@ -8,8 +8,12 @@ export const renameTrainingType = (id, trainingName) =>
 export const deleteTrainingType = (id) =>
   api.delete(`/trainings/types/${id}`).then((r) => r.data);
 
-export const getAssignableEmployees = () =>
-  api.get("/trainings/employees").then((r) => r.data);
+// scope "own" = this admin's plant (default), "others" = every other plant.
+export const getAssignableEmployees = (scope = "own") =>
+  api.get("/trainings/employees", { params: scope === "others" ? { scope } : {} }).then((r) => r.data);
+
+// Trainers from the shared list (all plants).
+export const getTrainerOptions = () => api.get("/trainings/trainer-options").then((r) => r.data);
 
 export const getTrainings = () => api.get("/trainings").then((r) => r.data);
 export const getTrainingDetail = (id) => api.get(`/trainings/${id}`).then((r) => r.data);
@@ -19,3 +23,7 @@ export const createTraining = (payload) =>
 
 export const downloadTrainingZip = (id) =>
   api.get(`/trainings/${id}/download`, { responseType: "blob" });
+
+// One employee's completed form as a single PDF.
+export const downloadFeedbackPdf = (trainingId, recordId) =>
+  api.get(`/trainings/${trainingId}/feedback/${recordId}/pdf`, { responseType: "blob" });

@@ -1,289 +1,106 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, UserRound } from "lucide-react";
 import { toast } from "react-toastify";
 
+import AuthShell from "../components/layout/AuthShell";
+import Button from "../components/ui/Button";
+import Field from "../components/ui/Field";
 import authService from "../services/authService";
 
 function AdminLogin() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.username.trim() || !formData.password.trim()) {
-      toast.error("Username and Password are required.");
-
+      toast.error("Username and password are required.");
       return;
     }
 
     try {
       setLoading(true);
-
-      const response = await authService.login(
-        formData.username,
-        formData.password,
-      );
-
+      const response = await authService.login(formData.username, formData.password);
       if (response.success) {
-        toast.success("Login successful!");
-
-        setTimeout(() => {
-          navigate("/admin/dashboard");
-        }, 800);
+        toast.success("Signed in.");
+        navigate("/admin/dashboard");
       }
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Unable to login. Please try again.",
-      );
+      toast.error(err.response?.data?.message || "Unable to sign in. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="
-        min-h-screen
-        bg-gray-100
-        flex
-        items-center
-        justify-center
-        px-4
-      "
+    <AuthShell
+      title="Run every plant’s training feedback from one place."
+      subtitle="Assign trainings, see who has responded, and download the signed feedback forms as PDFs."
+      points={["Plant-wise access — you only see your own plant", "Live pending / completed tracking", "One-click PDF and ZIP downloads"]}
+      footer={
+        <Link to="/" className="font-medium text-brand-700 hover:text-brand-900">
+          ← Employee sign in
+        </Link>
+      }
     >
-      <div
-        className="
-          w-full
-          max-w-md
-          bg-white
-          rounded-3xl
-          shadow-xl
-          border
-          border-gray-200
-          p-8
-        "
-      >
-        {/* Header */}
-
-        <div className="text-center mb-8">
-          <div
-            className="
-              mx-auto
-              w-14
-              h-14
-              rounded-2xl
-              bg-gray-900
-              text-white
-              flex
-              items-center
-              justify-center
-              mb-4
-            "
-          >
-            <LockKeyhole size={26} />
-          </div>
-
-          <h1
-            className="
-              text-2xl
-              font-bold
-              text-gray-900
-            "
-          >
-            Training Feedback System Dietech India
-          </h1>
-
-          <p
-            className="
-              mt-2
-              text-gray-500
-              text-sm
-            "
-          >
-            Admin Portal Login
-          </p>
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+        <div className="mb-7">
+          <span className="inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-800">
+            Admin portal
+          </span>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Sign in</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Use the username and password for your plant.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Username */}
+          <Field
+            label="Username"
+            name="username"
+            icon={UserRound}
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Enter username"
+            autoComplete="username"
+            autoFocus
+          />
 
-          <div>
-            <label
-              className="
-                block
-                mb-2
-                text-sm
-                font-semibold
-                text-gray-700
-              "
-            >
-              Username
-            </label>
-
-            <div className="relative">
-              <UserRound
-                size={18}
-
-                className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                "
-              />
-
-              <input
-                type="text"
-
-                name="username"
-
-                value={formData.username}
-
-                onChange={handleChange}
-
-                placeholder="Enter Username"
-
-                autoComplete="username"
-
-                className="
-                  w-full
-                  pl-11
-                  pr-4
-                  py-3
-                  rounded-xl
-                  border
-                  border-gray-300
-                  text-sm
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-gray-900
-                  transition
-                "
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-
-          <div>
-            <label
-              className="
-                block
-                mb-2
-                text-sm
-                font-semibold
-                text-gray-700
-              "
-            >
-              Password
-            </label>
-
-            <div className="relative">
-              <LockKeyhole
-                size={18}
-
-                className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                "
-              />
-
-              <input
-                type={showPassword ? "text" : "password"}
-
-                name="password"
-
-                value={formData.password}
-
-                onChange={handleChange}
-
-                placeholder="Enter Password"
-
-                autoComplete="current-password"
-
-                className="
-                  w-full
-                  pl-11
-                  pr-14
-                  py-3
-                  rounded-xl
-                  border
-                  border-gray-300
-                  text-sm
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-gray-900
-                  transition
-                "
-              />
-
+          <Field
+            label="Password"
+            name="password"
+            icon={LockKeyhole}
+            type={showPassword ? "text" : "password"}
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            autoComplete="current-password"
+            trailing={
               <button
                 type="button"
-
-                onClick={() => setShowPassword(!showPassword)}
-
-                className="
-                  absolute
-                  right-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-500
-                  hover:text-gray-900
-                "
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-            </div>
-          </div>
+            }
+          />
 
-          {/* Login Button */}
-
-          <button
-            type="submit"
-
-            disabled={loading}
-
-            className="
-              w-full
-              py-3
-              rounded-xl
-              bg-gray-900
-              text-white
-              font-semibold
-              hover:bg-black
-              transition
-              disabled:opacity-50
-              disabled:cursor-not-allowed
-            "
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
+          <Button type="submit" size="lg" loading={loading} className="w-full">
+            {loading ? "Signing in…" : "Sign in"}
+          </Button>
         </form>
       </div>
-    </div>
+    </AuthShell>
   );
 }
 

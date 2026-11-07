@@ -1,8 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, IdCard, LockKeyhole, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, IdCard, LockKeyhole, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 
+import AuthShell from "../components/layout/AuthShell";
+import Button from "../components/ui/Button";
+import Field from "../components/ui/Field";
+import { initials } from "../utils/format";
 import {
   verifyEmployee,
   setEmployeePassword,
@@ -53,7 +57,7 @@ function EmployeeLogin() {
 
       localStorage.setItem("employeeToken", res.token);
       toast.success(employee.hasPassword ? "Welcome back!" : "Password set — you're in!");
-      setTimeout(() => navigate("/employee/dashboard"), 600);
+      navigate("/employee/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -61,101 +65,116 @@ function EmployeeLogin() {
     }
   };
 
+  const backToVerify = () => {
+    setStep("verify");
+    setPassword("");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gray-900 text-white flex items-center justify-center mb-4">
-            {step === "verify" ? <IdCard size={26} /> : <LockKeyhole size={26} />}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Training Feedback</h1>
-          <p className="mt-2 text-gray-500 text-sm">
-            {step === "verify" ? "Enter your Employee Number to continue" : "Confirm your details"}
-          </p>
+    <AuthShell
+      title="Your feedback makes every training better."
+      subtitle="Rate the sessions you attended in about two minutes. Your answers go straight to the plant’s training team."
+      points={["Takes less than 2 minutes", "Works on your phone or any shared PC", "Sign in with your Employee Number"]}
+      footer={
+        <Link to="/admin/login" className="font-medium text-brand-700 hover:text-brand-900">
+          Admin sign in →
+        </Link>
+      }
+    >
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+        {/* Step indicator */}
+        <div className="mb-6 flex items-center gap-2" aria-hidden="true">
+          <span className="h-1.5 flex-1 rounded-full bg-brand-600" />
+          <span className={`h-1.5 flex-1 rounded-full transition ${step === "password" ? "bg-brand-600" : "bg-slate-200"}`} />
         </div>
 
         {step === "verify" && (
           <form onSubmit={handleVerify} className="space-y-5">
             <div>
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
-                Employee Number
-              </label>
-              <div className="relative">
-                <IdCard size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={employeeNo}
-                  onChange={(e) => setEmployeeNo(e.target.value)}
-                  placeholder="e.g. 00123"
-                  autoFocus
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
-                />
-              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Welcome</h1>
+              <p className="mt-1.5 text-sm text-slate-500">Enter your Employee Number to continue.</p>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Checking..." : "Continue"}
-            </button>
+            <Field
+              label="Employee Number"
+              name="employeeNo"
+              icon={IdCard}
+              value={employeeNo}
+              onChange={(e) => setEmployeeNo(e.target.value)}
+              placeholder="e.g. EMP0001"
+              autoFocus
+              autoComplete="username"
+              autoCapitalize="characters"
+            />
+
+            <Button type="submit" size="lg" loading={loading} className="w-full">
+              {loading ? "Checking…" : "Continue"}
+            </Button>
           </form>
         )}
 
         {step === "password" && employee && (
           <form onSubmit={handlePasswordSubmit} className="space-y-5">
-            <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
-              <CheckCircle2 size={20} className="text-gray-900 shrink-0" />
-              <div className="text-sm">
-                <p className="font-semibold text-gray-900">{employee.fullName}</p>
-                <p className="text-gray-500">{employee.department}</p>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                {employee.hasPassword ? "Welcome back" : "Create your password"}
+              </h1>
+              <p className="mt-1.5 text-sm text-slate-500">
+                {employee.hasPassword
+                  ? "Enter your password to see your trainings."
+                  : "First time here — choose a password to use from now on."}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-sm font-bold text-white">
+                {initials(employee.fullName)}
+              </div>
+              <div className="min-w-0 text-sm">
+                <p className="truncate font-semibold text-slate-900">{employee.fullName}</p>
+                <p className="truncate text-slate-500">
+                  {employeeNo.trim().toUpperCase()} · {employee.department}
+                </p>
               </div>
             </div>
 
-            <div>
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
-                {employee.hasPassword ? "Password" : "Set a new password"}
-              </label>
-              <div className="relative">
-                <LockKeyhole size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={employee.hasPassword ? "Enter your password" : "At least 6 characters"}
-                  autoFocus
-                  className="w-full pl-11 pr-14 py-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
-                />
+            <Field
+              label={employee.hasPassword ? "Password" : "New password"}
+              name="password"
+              icon={LockKeyhole}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={employee.hasPassword ? "Enter your password" : "At least 6 characters"}
+              autoFocus
+              autoComplete={employee.hasPassword ? "current-password" : "new-password"}
+              trailing={
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
-              </div>
-            </div>
+              }
+            />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Please wait..." : employee.hasPassword ? "Log In" : "Set Password & Continue"}
-            </button>
+            <Button type="submit" size="lg" loading={loading} className="w-full">
+              {loading ? "Please wait…" : employee.hasPassword ? "Log in" : "Set password & continue"}
+            </Button>
 
             <button
               type="button"
-              onClick={() => setStep("verify")}
-              className="w-full text-sm text-gray-500 hover:text-gray-900"
+              onClick={backToVerify}
+              className="flex w-full items-center justify-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900"
             >
-              Not you? Use a different Employee Number
+              <ArrowLeft size={15} /> Not you? Use a different number
             </button>
           </form>
         )}
       </div>
-    </div>
+    </AuthShell>
   );
 }
 

@@ -8,6 +8,7 @@ import cors from "cors";
 import connectDB from "./config/oracleDb.js";
 import authRoutes from "./routes/authRoutes.js";
 import trainingRoutes from "./routes/trainingRoutes.js";
+import trainerRoutes from "./routes/trainerRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import { adminLogin } from "./controllers/authController.js";
 
@@ -35,6 +36,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/trainings", trainingRoutes);
+app.use("/api/trainers", trainerRoutes);
 app.use("/api/feedback", feedbackRoutes);
 
 // Your existing frontend (services/authService.js) posts admin login to

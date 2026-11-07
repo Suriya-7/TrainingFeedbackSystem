@@ -1,1 +1,73 @@
 @import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ *  Design tokens — change a colour here and the whole app follows.
+ *  Brand colour is derived from the Dietech logo (deep navy).
+ * ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --color-brand-50: #f3f5ff;
+  --color-brand-100: #e6eaff;
+  --color-brand-200: #ccd4ff;
+  --color-brand-300: #a8b4fb;
+  --color-brand-400: #7a89f0;
+  --color-brand-500: #4f5fdc;
+  --color-brand-600: #3743c0;
+  --color-brand-700: #2833a0;
+  --color-brand-800: #1d2680;
+  --color-brand-900: #121a5c;
+  --color-brand-950: #0a0f3a;
+
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.05);
+  --shadow-lift: 0 12px 28px -12px rgb(15 23 42 / 0.22);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    background: var(--color-slate-50);
+    color: var(--color-slate-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Keyboard users get a clear focus ring everywhere */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  [role="button"],
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Toast: keep it clear of the notch and inside small screens */
+.Toastify__toast-container {
+  max-width: calc(100vw - 1.5rem);
+}
+@media (max-width: 480px) {
+  .Toastify__toast-container {
+    left: 0.75rem !important;
+    right: 0.75rem !important;
+    width: auto !important;
+    top: max(0.75rem, env(safe-area-inset-top)) !important;
+  }
+}

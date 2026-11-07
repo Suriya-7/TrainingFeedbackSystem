@@ -17,6 +17,7 @@ const flags = new Set(process.argv.slice(2));
 
 // Exactly the columns the application's SQL uses.
 const EXPECTED = {
+  TRAINERS: ["TRAINER_ID", "EMPLOYEE_NO", "ADDED_BY_PLANT", "IS_ACTIVE", "CREATED_AT", "UPDATED_AT"],
   TRAINING_TYPES: ["TRAINING_TYPE_ID", "TRAINING_NAME", "IS_ACTIVE", "CREATED_AT", "UPDATED_AT"],
   EMPLOYEE_CREDENTIALS: ["CREDENTIAL_ID", "EMPLOYEE_NO", "PLANT_CODE", "PASSWORD_HASH", "LAST_LOGIN_AT", "CREATED_AT", "UPDATED_AT"],
   TRAININGS: ["TRAINING_ID", "TRAINING_TYPE_ID", "TRAINER_EMPLOYEE_NO", "PLANT_CODE", "CREATED_AT"],
@@ -115,8 +116,8 @@ async function main() {
       found = t.rows.map((r) => r.TABLE_NAME);
       console.log("Tables in schema :", found.length ? found.join(", ") : "(none)");
       const missing = Object.keys(EXPECTED).filter((n) => !found.includes(n));
-      if (missing.length) console.log("⚠️  Missing tables:", missing.join(", "), "(if they are under another user, tell me the schema name)");
-      else console.log("✅ All 5 expected tables are present.");
+      if (missing.length) console.log("⚠️  Missing tables:", missing.join(", "), "(TRAINERS is new: send BackEnd/sql/trainers.sql to the DB team)");
+      else console.log(`✅ All ${Object.keys(EXPECTED).length} expected tables are present.`);
     });
 
     // ---- 3. Columns (one small query per table) ----

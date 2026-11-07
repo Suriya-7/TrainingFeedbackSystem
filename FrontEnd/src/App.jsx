@@ -8,6 +8,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCreateTraining from "./pages/AdminCreateTraining";
 import AdminTrainingDetail from "./pages/AdminTrainingDetail";
+import AdminTrainers from "./pages/AdminTrainers";
 
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,8 +19,22 @@ function App() {
       <Routes>
         {/* Employee */}
         <Route path="/" element={<EmployeeLogin />} />
-        <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-        <Route path="/employee/feedback/:id" element={<EmployeeFeedbackForm />} />
+        <Route
+          path="/employee/dashboard"
+          element={
+            <ProtectedRoute role="employee">
+              <EmployeeDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employee/feedback/:id"
+          element={
+            <ProtectedRoute role="employee">
+              <EmployeeFeedbackForm />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -36,6 +51,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminCreateTraining />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/trainers"
+          element={
+            <ProtectedRoute>
+              <AdminTrainers />
             </ProtectedRoute>
           }
         />

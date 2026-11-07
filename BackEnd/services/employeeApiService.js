@@ -60,9 +60,17 @@ async function realListByPlant(/* plantCode */) {
   return notConfigured();
 }
 
+async function realListAll() {
+  // TODO: axios.get(...) -> res.data.map(normalize)   (every plant, not just one)
+  return notConfigured();
+}
+
 // ---------------------------------------------------------------- EXPORTS
 export const fetchEmployeeByNo = async (empNo) =>
   USE_MOCK ? mockGetByNo(empNo) : realGetByNo(empNo);
 
 export const fetchEmployeesByPlant = async (plantCode) =>
   USE_MOCK ? mockListByPlant(plantCode) : realListByPlant(plantCode);
+
+// Every employee of every plant (trainer management, "add other plants' employees").
+export const fetchAllEmployees = async () => (USE_MOCK ? mockEmployees : realListAll());

@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClipboardList, ChevronRight, Inbox, LogOut } from "lucide-react";
+import { ClipboardList, ChevronRight, PartyPopper, CalendarDays } from "lucide-react";
 import { toast } from "react-toastify";
 
+import EmployeeLayout from "../components/layout/EmployeeLayout";
+import EmptyState from "../components/ui/EmptyState";
+import { Skeleton } from "../components/ui/Skeleton";
 import { getPendingFeedback } from "../services/employeeApi";
+import { formatDate } from "../utils/format";
 
 function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -17,58 +21,59 @@ function EmployeeDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("employeeToken");
-    navigate("/");
-  };
-
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-10">
-      <div className="max-w-xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Your Trainings</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900"
-          >
-            <LogOut size={16} /> Log out
-          </button>
-        </div>
-
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6">
-          {loading ? (
-            <p className="text-sm text-gray-500 text-center py-10">Loading...</p>
-          ) : pending.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-                <Inbox size={26} className="text-gray-400" />
-              </div>
-              <p className="font-semibold text-gray-900">No training assigned right now</p>
-              <p className="text-sm text-gray-500 mt-1">Check back later.</p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-gray-100">
-              {pending.map((item) => (
-                <li key={item.RECORD_ID}>
-                  <button
-                    onClick={() => navigate(`/employee/feedback/${item.RECORD_ID}`)}
-                    className="w-full flex items-center justify-between py-4 text-left hover:bg-gray-50 -mx-2 px-2 rounded-xl transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center shrink-0">
-                        <ClipboardList size={18} />
-                      </div>
-                      <span className="font-medium text-gray-900">{item.COURSE_NAME}</span>
-                    </div>
-                    <ChevronRight size={18} className="text-gray-400" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <EmployeeLayout>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Your trainings</h1>
+        <p className="mt-1.5 text-sm text-slate-500">
+          {loading
+            ? "Checking for feedback forms…"
+            : pending.length > 0
+            ? `${pending.length} feedback form${pending.length > 1 ? "s" : ""} waiting for you.`
+            : "You’re all caught up."}
+        </p>
       </div>
-    </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[84px] rounded-2xl" />
+          ))}
+        </div>
+      ) : pending.length === 0 ? (
+        <EmptyState
+          icon={PartyPopper}
+          title="No feedback pending"
+          text="When a training is assigned to you, its feedback form will show up here."
+        />
+      ) : (
+        <ul className="space-y-3">
+          {pending.map((item) => (
+            <li key={item.RECORD_ID}>
+              <button
+                onClick={() => navigate(`/employee/feedback/${item.RECORD_ID}`)}
+                className="group flex w-full items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-card transition hover:border-brand-300 hover:shadow-lift sm:p-5"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                  <ClipboardList size={22} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold text-slate-900">{item.COURSE_NAME}</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                    <CalendarDays size={13} />
+                    Assigned {formatDate(item.ASSIGNED_AT)}
+                  </p>
+                </div>
+                <span className="hidden rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20 sm:inline">
+                  Fill feedback
+                </span>
+                <ChevronRight size={20} className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-600" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </EmployeeLayout>
   );
 }
 
